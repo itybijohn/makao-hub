@@ -1,5 +1,4 @@
 from sqlmodel import SQLModel, Field
-from typing import Optional
 import uuid
 
 def generate_uuid():
@@ -23,12 +22,12 @@ class Property(SQLModel, table=True):
     status: str = "active"
     landlord_id: str = "landlord_123"
 
-   class TenantApplication(SQLModel, table=True):
-       id: str = Field(default_factory=generate_uuid, primary_key=True)
-       property_id: str
-       tenant_id: str
-       status: str = "pending"
-       message: str = ""  
+class TenantApplication(SQLModel, table=True):
+    id: str = Field(default_factory=generate_uuid, primary_key=True)
+    property_id: str
+    tenant_id: str
+    status: str = "pending"
+    message: str = ""
 
 class FundiJob(SQLModel, table=True):
     id: str = Field(default_factory=generate_uuid, primary_key=True)
