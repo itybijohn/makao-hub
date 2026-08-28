@@ -141,10 +141,8 @@ def create_property(data: PropertyCreate, user: dict = Depends(get_current_user)
     session.commit()
     session.refresh(new_prop)
     return {"message": "Property added successfully", "property": new_prop.model_dump()}
-
-# --- SERVE FRONTEND ---
 @app.get("/")
 def serve_frontend():
     return FileResponse("static/index.html")
 
-   create_db_and_tables()
+create_db_and_tables()
