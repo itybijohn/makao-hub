@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Makao Digital Hub - Landlord Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans">
+
+    <!-- LOGIN VIEW -->
+    <div id="login-view" class="min-h-screen flex items-center justify-center">
+        <div class="bg-white p-8 rounded-xl shadow-lg w-full max-w-md">
+            <div class="text-center mb-6">
+                <h1 class="text-3xl font-bold text-indigo-600">Makao Hub</h1>
+                <p class="text-gray-500 mt-2">Landlord Portal</p>
+            </div>
+            <form id="login-form" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Username</label>
+                    <input type="text" id="username" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" required>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Password</label>
+                    <input type="password" id="password" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" required>
+                </div>
+                <button type="submit" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    Sign In
+                </button>
+                <p id="error-msg" class="text-red-500 text-sm text-center hidden"></p>
+            </form>
+        </div>
+    </div>
+
+    <!-- DASHBOARD VIEW -->
+    <div id="dashboard-view" class="hidden min-h-screen">
+        <!-- Navbar -->
+        <nav class="bg-indigo-600 text-white shadow-lg">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex items-center justify-between h-16">
+                    <span class="text-xl font-bold">Makao Digital Hub</span>
+                    <button onclick="logout()" class="bg-indigo-700 hover:bg-indigo-800 px-4 py-2 rounded-md text-sm font-medium">Logout</button>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Content -->
+        <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="mb-8">
+                <h2 class="text-2xl font-bold text-gray-900">My Properties</h2>
+                <p class="text-gray-500">Manage your real estate portfolio</p>
+            </div>
+
+            <!-- Add Property Form -->
+            <div class="bg-white p-6 rounded-lg shadow-md mb-8">
+                <h3 class="text-lg font-semibold text-gray-800 mb-4">Add New Property</h3>
+                <form id="add-property-form" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <input type="text" id="prop-title" placeholder="Property Title (e.g. Karen Villa)" class="px-3 py-2 border border-gray-300 rounded-md" required>
+                    <input type="text" id="prop-location" placeholder="Location (e.g. Karen, Nairobi)" class="px-3 py-2 border border-gray-300 rounded-md" required>
+                    <input type="number" id="prop-rent" placeholder="Rent Amount (KES)" class="px-3 py-2 border border-gray-300 rounded-md" required>
+                    <input type="number" id="prop-deposit" placeholder="Security Deposit (KES)" class="px-3 py-2 border border-gray-300 rounded-md">
+                    <input type="number" id="prop-beds" placeholder="Bedrooms" class="px-3 py-2 border border-gray-300 rounded-md" required>
+                    <textarea id="prop-description" placeholder="Property Description (optional)" rows="3" class="md:col-span-2 px-3 py-2 border border-gray-300 rounded-md"></textarea>
+                    <input type="url" id="prop-tour" placeholder="Virtual Tour URL (optional - YouTube/360 link)" class="md:col-span-2 px-3 py-2 border border-gray-300 rounded-md">
+                    <button type="submit" class="md:col-span-2 bg-green-600 text-white py-2 rounded-md hover:bg-green-700 font-medium">
+                        + Add Property to Database
+                    </button>
+                </form>
+            </div>
+
+            <!-- Loading State -->
+            <div id="loading" class="text-center py-12 hidden">
+                <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+                <p class="mt-2 text-gray-500">Loading live data from database...</p>
+            </div>
+
+            <!-- Properties Grid -->
+            <div id="properties-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 hidden">
+                <!-- Properties will be injected here by JS -->
+            </div>
+            
+            <!-- Empty State -->
+            <div id="empty-state" class="text-center py-12">
+                <p class="text-gray-500 text-lg">No properties found.</p>
+                <p class="text-gray-400 text-sm mt-2">Add properties via the API to see them here.</p>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const AUTH_URL = 'http://127.0.0.1:8001/api/v1/auth/login';
+        const DASHBOARD_URL = 'http://127.0.0.1:8000/api/v1/dashboard/landlord';
+
+        // Check if already logged in on page load
+        window.addEventListener('DOMContentLoaded', () => {
+            const token = localStorage.getItem('makao_token');
+            if (token) {
+                showDashboard();
+            } else {
+                document.getElementById('login-view').classList.remove('hidden');
+            }
+        });
+
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const errorMsg = document.getElementById('error-msg');
+
+            try {
+                const response = await fetch(AUTH_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Invalid credentials');
+                }
+                
+                const data = await response.json();
+                localStorage.setItem('makao_token', data.access_token);
+                showDashboard();
+            } catch (error) {
+                errorMsg.textContent = 'Login failed. Check your username and password.';
+                errorMsg.classList.remove('hidden');
+            }
+        });
+
+        async function showDashboard() {
+            document.getElementById('login-view').classList.add('hidden');
+            document.getElementById('dashboard-view').classList.remove('hidden');
+            document.getElementById('loading').classList.remove('hidden');
+            document.getElementById('properties-grid').classList.add('hidden');
+            document.getElementById('empty-state').classList.add('hidden');
+
+            const token = localStorage.getItem('makao_token');
+            try {
+                const response = await fetch(DASHBOARD_URL, {
+                    headers: { 
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Unauthorized - Token may be invalid');
+                }
+
+                const data = await response.json();
+                
+                if (data.my_properties && data.my_properties.length > 0) {
+                    renderProperties(data.my_properties);
+                    document.getElementById('properties-grid').classList.remove('hidden');
+                } else {
+                    document.getElementById('empty-state').classList.remove('hidden');
+                }
+            } catch (error) {
+                console.error('Failed to load dashboard:', error);
+                logout();
+            } finally {
+                document.getElementById('loading').classList.add('hidden');
+            }
+        }
+
+        function renderProperties(properties) {
+            const grid = document.getElementById('properties-grid');
+            grid.innerHTML = '';
+
+            properties.forEach(prop => {
+                const card = document.createElement('div');
+                card.className = 'bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow';
+                card.innerHTML = `
+                    <div class="p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-lg font-bold text-gray-900">${prop.title || 'Untitled Property'}</h3>
+                            <span class="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">${prop.status || 'active'}</span>
+                        </div>
+                        <div class="space-y-2 text-sm text-gray-600">
+                            <div class="flex items-center">
+                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                </svg>
+                                ${prop.location || 'Location not specified'}
+                            </div>
+                            <div class="flex items-center">
+                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+                                </svg>
+                                ${prop.bedrooms || 0} Bedrooms
+                            </div>
+                            ${prop.deposit ? `
+                            <div class="flex items-center text-gray-500">
+                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                                Deposit: KES ${(prop.deposit || 0).toLocaleString()}
+                            </div>` : ''}
+                            ${prop.description ? `
+                            <p class="text-xs text-gray-500 mt-2 line-clamp-2">${prop.description}</p>` : ''}
+                            ${prop.virtual_tour_url ? `
+                            <a href="${prop.virtual_tour_url}" target="_blank" class="text-xs text-indigo-600 hover:text-indigo-800 mt-1 inline-block">🎥 View Virtual Tour</a>` : ''}
+                            <div class="flex items-center font-semibold text-indigo-600 text-lg mt-4">
+                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                                KES ${(prop.rent_amount || 0).toLocaleString()} / month
+                            </div>
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        // Handle Add Property Form
+        document.getElementById('add-property-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const token = localStorage.getItem('makao_token');
+            
+            const newProperty = {
+                title: document.getElementById('prop-title').value,
+                location: document.getElementById('prop-location').value,
+                rent_amount: parseFloat(document.getElementById('prop-rent').value),
+                bedrooms: parseInt(document.getElementById('prop-beds').value),
+                deposit: parseFloat(document.getElementById('prop-deposit').value) || 0,
+                description: document.getElementById('prop-description').value,
+                virtual_tour_url: document.getElementById('prop-tour').value
+            };
+
+            try {
+                const response = await fetch('http://127.0.0.1:8000/api/v1/landlord/properties', {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(newProperty)
+                });
+
+                if (response.ok) {
+                    alert('Property added successfully!');
+                    document.getElementById('add-property-form').reset();
+                    showDashboard(); // Refresh the grid
+                } else {
+                    alert('Failed to add property.');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        });
+
+        function logout() {
+            localStorage.removeItem('makao_token');
+            document.getElementById('dashboard-view').classList.add('hidden');
+            document.getElementById('login-view').classList.remove('hidden');
+            document.getElementById('login-form').reset();
+        }
+    </script>
+</body>
+</html>
