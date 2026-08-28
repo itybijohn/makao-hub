@@ -3,7 +3,7 @@ from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from fastapi.responses import FileResponse
 from pydantic import BaseModel
 from sqlmodel import Session, select
-from database import get_session
+from database import get_session, create_db_and_tables
 from models import Property, TenantApplication, FundiJob, UserBalance, User
 import jwt
 from datetime import datetime, timedelta
@@ -146,3 +146,5 @@ def create_property(data: PropertyCreate, user: dict = Depends(get_current_user)
 @app.get("/")
 def serve_frontend():
     return FileResponse("static/index.html")
+
+   create_db_and_tables()
