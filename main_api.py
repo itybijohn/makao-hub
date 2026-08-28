@@ -11,6 +11,7 @@ from passlib.context import CryptContext
 from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI(title="Makao Digital Hub - Integrated Platform")
+
 security = HTTPBearer()
 SECRET_KEY = "makao_super_secret_production_key_change_this_later"
 ALGORITHM = "HS256"
@@ -71,7 +72,6 @@ def register_user(data: UserRegister, session: Session = Depends(get_session)):
     existing_user = session.exec(select(User).where(User.username == data.username)).first()
     if existing_user:
         raise HTTPException(status_code=400, detail="Username already exists")
-    
     new_user = User(username=data.username, password=get_password_hash(data.password), role=data.role)
     session.add(new_user)
     session.commit()
@@ -82,14 +82,12 @@ def login_user(data: UserLogin, session: Session = Depends(get_session)):
     user = session.exec(select(User).where(User.username == data.username)).first()
     if not user or not verify_password(data.password, user.password):
         raise HTTPException(status_code=401, detail="Invalid credentials")
-    
     payload = {
         "user_id": user.id,
         "role": user.role,
         "exp": datetime.utcnow() + timedelta(days=7)
     }
     token = jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
-    # CRITICAL FIX: Returning the role so the frontend can save it!
     return {"access_token": token, "token_type": "bearer", "role": user.role}
 
 # --- DASHBOARDS ---
@@ -99,19 +97,23 @@ def landlord_dashboard(user: dict = Depends(get_current_user), session: Session 
     applications = session.exec(select(TenantApplication).where(TenantApplication.status == "pending")).all()
     balance_obj = session.exec(select(UserBalance).where(UserBalance.user_id == user["user_id"])).first()
     balance = balance_obj.balance if balance_obj else 0.0
-
+    
+    # Count unread applications for notification
+    unread_count = len([a for a in applications if a.status == "pending"])
+    
     return {
         "user": user,
         "my_properties": [p.model_dump() for p in properties],
         "pending_applications": [a.model_dump() for a in applications],
         "real_balance": balance,
+        "unread_notifications": unread_count,
         "message": "Live data pulled from database"
     }
 
 @app.get("/api/v1/dashboard/tenant")
 def tenant_dashboard(user: dict = Depends(get_current_user), session: Session = Depends(get_session)):
     properties = session.exec(select(Property)).all()
-    applications = session.exec(select(TenantApplication).where(TenantApplication.tenant_id == user["user_id"])).all() 
+    applications = session.exec(select(TenantApplication).where(TenantApplication.tenant_id == user["user_id"])).all()
     return {
         "user": user,
         "available_properties": [p.model_dump() for p in properties],
@@ -156,7 +158,6 @@ def create_application(data: ApplicationCreate, user: dict = Depends(get_current
     existing = session.exec(select(TenantApplication).where(TenantApplication.property_id == data.property_id, TenantApplication.tenant_id == user["user_id"])).first()
     if existing:
         raise HTTPException(status_code=400, detail="You have already applied for this property")
-
     new_app = TenantApplication(property_id=data.property_id, tenant_id=user["user_id"], message=data.message, status="pending")
     session.add(new_app)
     session.commit()
@@ -168,7 +169,6 @@ def get_landlord_applications(user: dict = Depends(get_current_user), session: S
     my_properties = session.exec(select(Property).where(Property.landlord_id == user["user_id"])).all()
     my_property_ids = [p.id for p in my_properties]
     if not my_property_ids: return []
-
     applications = session.exec(select(TenantApplication).where(TenantApplication.property_id.in_(my_property_ids))).all()
     result = []
     for app in applications:
@@ -193,15 +193,26 @@ def get_tenant_applications(user: dict = Depends(get_current_user), session: Ses
 def update_application_status(application_id: str, data: ApplicationUpdate, user: dict = Depends(get_current_user), session: Session = Depends(get_session)):
     app = session.get(TenantApplication, application_id)
     if not app: raise HTTPException(status_code=404, detail="Application not found")
-        
     prop = session.get(Property, app.property_id)
     if not prop or prop.landlord_id != user["user_id"]: raise HTTPException(status_code=403, detail="Not authorized")
-        
     app.status = data.status
     session.add(app)
     session.commit()
     session.refresh(app)
     return {"message": f"Application {data.status}", "application": app.model_dump()}
+
+# --- NOTIFICATION ENDPOINT ---
+@app.get("/api/v1/notifications/unread")
+def get_unread_notifications(user: dict = Depends(get_current_user), session: Session = Depends(get_session)):
+    if user["role"] == "landlord":
+        my_properties = session.exec(select(Property).where(Property.landlord_id == user["user_id"])).all()
+        my_property_ids = [p.id for p in my_properties]
+        if not my_property_ids:
+            return {"unread_count": 0}
+        unread = session.exec(select(TenantApplication).where(TenantApplication.property_id.in_(my_property_ids), TenantApplication.status == "pending")).all()
+        return {"unread_count": len(unread)}
+    else:
+        return {"unread_count": 0}
 
 # --- SERVE FRONTEND ---
 @app.get("/")
