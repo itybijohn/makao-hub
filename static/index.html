@@ -3,278 +3,304 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Makao Digital Hub - Landlord Dashboard</title>
+    <title>Makao Digital Hub</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-50 text-gray-800 font-sans">
 
-    <!-- LOGIN VIEW -->
-    <div id="login-view" class="min-h-screen flex items-center justify-center p-4">
+    <!-- LOGIN/REGISTER VIEW -->
+    <div id="auth-view" class="min-h-screen flex items-center justify-center p-4">
         <div class="bg-white p-8 rounded-xl shadow-lg w-full max-w-md">
             <div class="text-center mb-6">
                 <h1 class="text-3xl font-bold text-indigo-600">Makao Hub</h1>
-                <p class="text-gray-500 mt-2">Landlord Portal</p>
+                <p class="text-gray-500 mt-2">Your Digital Property Partner</p>
             </div>
             
             <!-- Login Form -->
             <form id="login-form" class="space-y-4">
                 <div>
                     <label class="block text-sm font-medium text-gray-700">Username</label>
-                    <input type="text" id="username" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" required>
+                    <input type="text" id="username" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md" required>
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700">Password</label>
-                    <input type="password" id="password" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" required>
+                    <input type="password" id="password" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md" required>
                 </div>
-                <button type="submit" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700">
-                    Sign In
-                </button>
+                <button type="submit" class="w-full bg-indigo-600 text-white py-2 rounded-md hover:bg-indigo-700 font-medium">Sign In</button>
                 <p id="error-msg" class="text-red-500 text-sm text-center hidden"></p>
                 <p class="text-center text-sm text-gray-600 mt-4">
-                    Don't have an account? 
-                    <a href="#" onclick="showRegister()" class="text-indigo-600 hover:underline font-semibold">Register here</a>
+                    New here? <a href="#" onclick="showRegister()" class="text-indigo-600 hover:underline font-semibold">Create an account</a>
                 </p>
             </form>
 
-            <!-- Register Form (Hidden by default) -->
+            <!-- Register Form -->
             <form id="register-form" class="space-y-4 hidden">
                 <div>
                     <label class="block text-sm font-medium text-gray-700">Username</label>
-                    <input type="text" id="reg-username" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500" required>
+                    <input type="text" id="reg-username" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md" required>
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700">Password</label>
-                    <input type="password" id="reg-password" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500" required>
+                    <input type="password" id="reg-password" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md" required>
                 </div>
-                <button type="submit" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700">
-                    Create Account
-                </button>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">I am a...</label>
+                    <select id="reg-role" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md">
+                        <option value="landlord">Landlord (I own properties)</option>
+                        <option value="tenant">Tenant (I want to rent)</option>
+                    </select>
+                </div>
+                <button type="submit" class="w-full bg-green-600 text-white py-2 rounded-md hover:bg-green-700 font-medium">Create Account</button>
                 <p id="reg-error-msg" class="text-red-500 text-sm text-center hidden"></p>
                 <p class="text-center text-sm text-gray-600 mt-4">
-                    Already have an account? 
-                    <a href="#" onclick="showLogin()" class="text-indigo-600 hover:underline font-semibold">Login here</a>
+                    Have an account? <a href="#" onclick="showLogin()" class="text-indigo-600 hover:underline font-semibold">Sign in</a>
                 </p>
             </form>
         </div>
     </div>
 
-    <!-- DASHBOARD VIEW -->
+    <!-- MAIN DASHBOARD VIEW -->
     <div id="dashboard-view" class="hidden min-h-screen">
         <nav class="bg-indigo-600 text-white shadow-lg">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="flex items-center justify-between h-16">
-                    <span class="text-xl font-bold">Makao Digital Hub</span>
-                    <button onclick="logout()" class="bg-indigo-700 hover:bg-indigo-800 px-4 py-2 rounded-md text-sm font-medium">Logout</button>
+                    <span class="text-xl font-bold">Makao Hub</span>
+                    <div class="flex items-center space-x-4">
+                        <span id="user-role-display" class="text-sm bg-indigo-700 px-3 py-1 rounded-full"></span>
+                        <button onclick="logout()" class="bg-indigo-800 hover:bg-indigo-900 px-4 py-2 rounded-md text-sm font-medium">Logout</button>
+                    </div>
                 </div>
             </div>
         </nav>
 
         <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <div class="mb-8">
-                <h2 class="text-2xl font-bold text-gray-900">My Properties</h2>
-                <p class="text-gray-500">Manage your real estate portfolio</p>
+            <!-- Navigation Tabs -->
+            <div class="flex space-x-4 mb-8 border-b border-gray-200">
+                <button onclick="switchTab('properties')" id="tab-properties" class="tab-btn py-2 px-4 border-b-2 border-indigo-600 text-indigo-600 font-medium">My Properties</button>
+                <button onclick="switchTab('browse')" id="tab-browse" class="tab-btn py-2 px-4 text-gray-500 hover:text-gray-700">Browse Homes</button>
+                <button onclick="switchTab('applications')" id="tab-applications" class="tab-btn py-2 px-4 text-gray-500 hover:text-gray-700">Applications</button>
             </div>
 
-            <!-- Add Property Form -->
-            <div class="bg-white p-6 rounded-lg shadow-md mb-8">
-                <h3 class="text-lg font-semibold text-gray-800 mb-4">Add New Property</h3>
-                <form id="add-property-form" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <input type="text" id="prop-title" placeholder="Property Title (e.g. Karen Villa)" class="px-3 py-2 border border-gray-300 rounded-md" required>
-                    <input type="text" id="prop-location" placeholder="Location (e.g. Karen, Nairobi)" class="px-3 py-2 border border-gray-300 rounded-md" required>
-                    <input type="number" id="prop-rent" placeholder="Rent Amount (KES)" class="px-3 py-2 border border-gray-300 rounded-md" required>
-                    <input type="number" id="prop-deposit" placeholder="Security Deposit (KES)" class="px-3 py-2 border border-gray-300 rounded-md">
-                    <input type="number" id="prop-beds" placeholder="Bedrooms" class="px-3 py-2 border border-gray-300 rounded-md" required>
-                    <textarea id="prop-description" placeholder="Property Description (optional)" rows="3" class="md:col-span-2 px-3 py-2 border border-gray-300 rounded-md"></textarea>
-                    <input type="url" id="prop-tour" placeholder="Virtual Tour URL (optional)" class="md:col-span-2 px-3 py-2 border border-gray-300 rounded-md">
-                    <button type="submit" class="md:col-span-2 bg-green-600 text-white py-2 rounded-md hover:bg-green-700 font-medium">
-                        + Add Property to Database
-                    </button>
-                </form>
+            <!-- TAB 1: MY PROPERTIES (Landlord) -->
+            <div id="view-properties" class="tab-content">
+                <div class="bg-white p-6 rounded-lg shadow-md mb-8">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4">Add New Property</h3>
+                    <form id="add-property-form" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <input type="text" id="prop-title" placeholder="Title (e.g. 2BR in Kilimani)" class="px-3 py-2 border rounded-md" required>
+                        <input type="text" id="prop-location" placeholder="Location" class="px-3 py-2 border rounded-md" required>
+                        <input type="number" id="prop-rent" placeholder="Rent (KES)" class="px-3 py-2 border rounded-md" required>
+                        <input type="number" id="prop-beds" placeholder="Bedrooms" class="px-3 py-2 border rounded-md" required>
+                        <textarea id="prop-description" placeholder="Description" rows="2" class="md:col-span-2 px-3 py-2 border rounded-md"></textarea>
+                        <button type="submit" class="md:col-span-2 bg-green-600 text-white py-2 rounded-md hover:bg-green-700">+ Add Property</button>
+                    </form>
+                </div>
+                <div id="my-properties-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
             </div>
 
-            <!-- Loading State -->
-            <div id="loading" class="text-center py-12 hidden">
-                <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
-                <p class="mt-2 text-gray-500">Loading live data from database...</p>
+            <!-- TAB 2: BROWSE HOMES (Tenant) -->
+            <div id="view-browse" class="tab-content hidden">
+                <h2 class="text-2xl font-bold text-gray-900 mb-6">Available Properties</h2>
+                <div id="browse-properties-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
             </div>
 
-            <!-- Properties Grid -->
-            <div id="properties-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 hidden"></div>
-            
-            <!-- Empty State -->
-            <div id="empty-state" class="text-center py-12">
-                <p class="text-gray-500 text-lg">No properties found.</p>
-                <p class="text-gray-400 text-sm mt-2">Add properties via the form above to see them here.</p>
+            <!-- TAB 3: APPLICATIONS (Landlord & Tenant) -->
+            <div id="view-applications" class="tab-content hidden">
+                <h2 class="text-2xl font-bold text-gray-900 mb-6">Applications</h2>
+                <div id="applications-list" class="space-y-4"></div>
             </div>
         </main>
     </div>
 
     <script>
-        // RELATIVE URLS: Works on localhost AND on Render!
-        const AUTH_URL = '/api/v1/auth/login';
-        const REGISTER_URL = '/api/v1/auth/register';
-        const DASHBOARD_URL = '/api/v1/dashboard/landlord';
-        const PROPERTY_URL = '/api/v1/landlord/properties';
+        const API = ''; // Relative URL
+        let currentUserRole = 'landlord';
 
+        // --- AUTH LOGIC ---
         window.addEventListener('DOMContentLoaded', () => {
             const token = localStorage.getItem('makao_token');
+            currentUserRole = localStorage.getItem('makao_role') || 'landlord';
             if (token) {
                 showDashboard();
-            } else {
-                document.getElementById('login-view').classList.remove('hidden');
             }
         });
 
-        function showRegister() {
-            document.getElementById('login-form').classList.add('hidden');
-            document.getElementById('register-form').classList.remove('hidden');
-            document.getElementById('error-msg').classList.add('hidden');
-        }
-
-        function showLogin() {
-            document.getElementById('register-form').classList.add('hidden');
-            document.getElementById('login-form').classList.remove('hidden');
-            document.getElementById('reg-error-msg').classList.add('hidden');
-        }
+        function showRegister() { document.getElementById('login-form').classList.add('hidden'); document.getElementById('register-form').classList.remove('hidden'); }
+        function showLogin() { document.getElementById('register-form').classList.add('hidden'); document.getElementById('login-form').classList.remove('hidden'); }
 
         document.getElementById('register-form').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const username = document.getElementById('reg-username').value;
-            const password = document.getElementById('reg-password').value;
-            const errorMsg = document.getElementById('reg-error-msg');
-
+            const data = {
+                username: document.getElementById('reg-username').value,
+                password: document.getElementById('reg-password').value,
+                role: document.getElementById('reg-role').value
+            };
             try {
-                const response = await fetch(REGISTER_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ username, password, role: 'landlord' })
-                });
-                if (!response.ok) {
-                    const err = await response.json();
-                    throw new Error(err.detail || 'Registration failed');
-                }
-                alert('Account created successfully! Please log in.');
+                const res = await fetch(`${API}/api/v1/auth/register`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(data) });
+                if (!res.ok) throw new Error((await res.json()).detail);
+                alert('Account created! Please log in.');
                 showLogin();
-            } catch (error) {
-                errorMsg.textContent = error.message;
-                errorMsg.classList.remove('hidden');
-            }
+            } catch (err) { document.getElementById('reg-error-msg').textContent = err.message; document.getElementById('reg-error-msg').classList.remove('hidden'); }
         });
 
         document.getElementById('login-form').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
-            const errorMsg = document.getElementById('error-msg');
-
+            const data = { username: document.getElementById('username').value, password: document.getElementById('password').value };
             try {
-                const response = await fetch(AUTH_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ username, password })
-                });
-                if (!response.ok) throw new Error('Invalid credentials');
-                
-                const data = await response.json();
-                localStorage.setItem('makao_token', data.access_token);
+                const res = await fetch(`${API}/api/v1/auth/login`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(data) });
+                if (!res.ok) throw new Error('Invalid credentials');
+                const result = await res.json();
+                localStorage.setItem('makao_token', result.access_token);
+                // Note: We aren't returning role in login yet, so we default to landlord or check a profile endpoint later. 
+                // For now, we'll just use the stored role or default.
                 showDashboard();
-            } catch (error) {
-                errorMsg.textContent = 'Login failed. Check your username and password.';
-                errorMsg.classList.remove('hidden');
-            }
+            } catch (err) { document.getElementById('error-msg').textContent = err.message; document.getElementById('error-msg').classList.remove('hidden'); }
         });
 
-        async function showDashboard() {
-            document.getElementById('login-view').classList.add('hidden');
+        function logout() { localStorage.clear(); location.reload(); }
+
+        // --- DASHBOARD LOGIC ---
+        function showDashboard() {
+            document.getElementById('auth-view').classList.add('hidden');
             document.getElementById('dashboard-view').classList.remove('hidden');
-            document.getElementById('loading').classList.remove('hidden');
-            document.getElementById('properties-grid').classList.add('hidden');
-            document.getElementById('empty-state').classList.add('hidden');
-
-            const token = localStorage.getItem('makao_token');
-            try {
-                const response = await fetch(DASHBOARD_URL, {
-                    headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' }
-                });
-                if (!response.ok) throw new Error('Unauthorized');
-
-                const data = await response.json();
-                if (data.my_properties && data.my_properties.length > 0) {
-                    renderProperties(data.my_properties);
-                    document.getElementById('properties-grid').classList.remove('hidden');
-                } else {
-                    document.getElementById('empty-state').classList.remove('hidden');
-                }
-            } catch (error) {
-                console.error('Failed to load dashboard:', error);
-                logout();
-            } finally {
-                document.getElementById('loading').classList.add('hidden');
+            document.getElementById('user-role-display').textContent = currentUserRole.toUpperCase();
+            
+            // Setup tabs based on role
+            if (currentUserRole === 'tenant') {
+                document.getElementById('tab-properties').style.display = 'none';
+                switchTab('browse');
+            } else {
+                switchTab('properties');
             }
         }
 
-        function renderProperties(properties) {
-            const grid = document.getElementById('properties-grid');
-            grid.innerHTML = '';
-            properties.forEach(prop => {
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(el => { el.classList.remove('border-b-2', 'border-indigo-600', 'text-indigo-600', 'font-medium'); el.classList.add('text-gray-500'); });
+            
+            document.getElementById(`view-${tabName}`).classList.remove('hidden');
+            const btn = document.getElementById(`tab-${tabName}`);
+            btn.classList.add('border-b-2', 'border-indigo-600', 'text-indigo-600', 'font-medium');
+            btn.classList.remove('text-gray-500');
+
+            if (tabName === 'properties') loadMyProperties();
+            if (tabName === 'browse') loadBrowseProperties();
+            if (tabName === 'applications') loadApplications();
+        }
+
+        // --- DATA FETCHING ---
+        async function loadMyProperties() {
+            const token = localStorage.getItem('makao_token');
+            const res = await fetch(`${API}/api/v1/dashboard/landlord`, { headers: { 'Authorization': `Bearer ${token}` } });
+            const data = await res.json();
+            renderGrid('my-properties-grid', data.my_properties || [], false);
+        }
+
+        async function loadBrowseProperties() {
+            const res = await fetch(`${API}/api/v1/properties`); // Public endpoint
+            const data = await res.json();
+            renderGrid('browse-properties-grid', data, true);
+        }
+
+        async function loadApplications() {
+            const token = localStorage.getItem('makao_token');
+            let apps = [];
+            if (currentUserRole === 'landlord') {
+                const res = await fetch(`${API}/api/v1/landlord/applications`, { headers: { 'Authorization': `Bearer ${token}` } });
+                apps = await res.json();
+                renderLandlordApps(apps);
+            } else {
+                // For tenant, we'd need a tenant applications endpoint. For now, show a placeholder.
+                document.getElementById('applications-list').innerHTML = '<p class="text-gray-500">Tenant application history coming soon!</p>';
+            }
+        }
+
+        // --- RENDERING ---
+        function renderGrid(containerId, properties, isBrowseMode) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = properties.length ? '' : '<p class="text-gray-500 col-span-3 text-center">No properties found.</p>';
+            
+            properties.forEach(p => {
                 const card = document.createElement('div');
-                card.className = 'bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow';
+                card.className = 'bg-white rounded-lg shadow-md p-6';
                 card.innerHTML = `
-                    <div class="p-6">
-                        <div class="flex items-center justify-between mb-4">
-                            <h3 class="text-lg font-bold text-gray-900">${prop.title || 'Untitled'}</h3>
-                            <span class="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">${prop.status || 'active'}</span>
-                        </div>
-                        <div class="space-y-2 text-sm text-gray-600">
-                            <div class="flex items-center"><svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>${prop.location || 'Location not specified'}</div>
-                            <div class="flex items-center"><svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>${prop.bedrooms || 0} Bedrooms</div>
-                            ${prop.deposit ? `<div class="flex items-center text-gray-500"><svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>Deposit: KES ${(prop.deposit || 0).toLocaleString()}</div>` : ''}
-                            ${prop.description ? `<p class="text-xs text-gray-500 mt-2 line-clamp-2">${prop.description}</p>` : ''}
-                            ${prop.virtual_tour_url ? `<a href="${prop.virtual_tour_url}" target="_blank" class="text-xs text-indigo-600 hover:text-indigo-800 mt-1 inline-block">🎥 View Virtual Tour</a>` : ''}
-                            <div class="flex items-center font-semibold text-indigo-600 text-lg mt-4"><svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>KES ${(prop.rent_amount || 0).toLocaleString()} / month</div>
-                        </div>
-                    </div>`;
-                grid.appendChild(card);
+                    <h3 class="text-lg font-bold">${p.title}</h3>
+                    <p class="text-gray-600 text-sm">📍 ${p.location}</p>
+                    <p class="text-indigo-600 font-bold mt-2">KES ${p.rent_amount.toLocaleString()}/mo</p>
+                    <p class="text-sm text-gray-500 mt-2">${p.description || ''}</p>
+                    ${isBrowseMode ? `<button onclick="applyForProperty('${p.id}')" class="mt-4 w-full bg-indigo-600 text-white py-2 rounded hover:bg-indigo-700">Apply Now</button>` : ''}
+                `;
+                container.appendChild(card);
             });
+        }
+
+        function renderLandlordApps(apps) {
+            const container = document.getElementById('applications-list');
+            container.innerHTML = apps.length ? '' : '<p class="text-gray-500">No applications yet.</p>';
+            apps.forEach(app => {
+                const div = document.createElement('div');
+                div.className = 'bg-white p-4 rounded-lg shadow flex justify-between items-center';
+                div.innerHTML = `
+                    <div>
+                        <p class="font-bold">${app.property_title}</p>
+                        <p class="text-sm text-gray-600">Message: "${app.message}"</p>
+                        <p class="text-xs mt-1">Status: <span class="font-semibold ${app.status === 'pending' ? 'text-yellow-600' : app.status === 'approved' ? 'text-green-600' : 'text-red-600'}">${app.status}</span></p>
+                    </div>
+                    ${app.status === 'pending' ? `
+                        <div class="space-x-2">
+                            <button onclick="updateApp('${app.id}', 'approved')" class="bg-green-500 text-white px-3 py-1 rounded text-sm">Approve</button>
+                            <button onclick="updateApp('${app.id}', 'rejected')" class="bg-red-500 text-white px-3 py-1 rounded text-sm">Reject</button>
+                        </div>
+                    ` : ''}
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        // --- ACTIONS ---
+        async function applyForProperty(propertyId) {
+            const token = localStorage.getItem('makao_token');
+            const message = prompt("Send a message to the landlord:");
+            if (!message) return;
+            
+            try {
+                const res = await fetch(`${API}/api/v1/applications`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify({ property_id: propertyId, message })
+                });
+                if (!res.ok) throw new Error((await res.json()).detail);
+                alert('Application sent successfully!');
+            } catch (err) { alert('Error: ' + err.message); }
+        }
+
+        async function updateApp(appId, status) {
+            const token = localStorage.getItem('makao_token');
+            await fetch(`${API}/api/v1/landlord/applications/${appId}`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                body: JSON.stringify({ status })
+            });
+            loadApplications(); // Refresh list
         }
 
         document.getElementById('add-property-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const token = localStorage.getItem('makao_token');
-            const newProperty = {
+            const data = {
                 title: document.getElementById('prop-title').value,
                 location: document.getElementById('prop-location').value,
                 rent_amount: parseFloat(document.getElementById('prop-rent').value),
                 bedrooms: parseInt(document.getElementById('prop-beds').value),
-                deposit: parseFloat(document.getElementById('prop-deposit').value) || 0,
-                description: document.getElementById('prop-description').value,
-                virtual_tour_url: document.getElementById('prop-tour').value
+                description: document.getElementById('prop-description').value
             };
-
-            try {
-                const response = await fetch(PROPERTY_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-                    body: JSON.stringify(newProperty)
-                });
-                if (response.ok) {
-                    alert('Property added successfully!');
-                    document.getElementById('add-property-form').reset();
-                    showDashboard();
-                } else {
-                    alert('Failed to add property.');
-                }
-            } catch (error) {
-                console.error('Error:', error);
-            }
+            await fetch(`${API}/api/v1/landlord/properties`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                body: JSON.stringify(data)
+            });
+            e.target.reset();
+            loadMyProperties();
         });
-
-        function logout() {
-            localStorage.removeItem('makao_token');
-            document.getElementById('dashboard-view').classList.add('hidden');
-            document.getElementById('login-view').classList.remove('hidden');
-            document.getElementById('login-form').reset();
-        }
     </script>
 </body>
 </html>
