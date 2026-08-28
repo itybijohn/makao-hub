@@ -146,3 +146,77 @@ def serve_frontend():
     return FileResponse("static/index.html")
 
 create_db_and_tables()
+
+
+
+# --- TENANT & APPLICATION ENDPOINTS ---
+
+class ApplicationCreate(BaseModel):
+    property_id: str
+    message: str = ""
+
+class ApplicationUpdate(BaseModel):
+    status: str # "approved" or "rejected"
+
+@app.get("/api/v1/properties")
+def get_public_properties(session: Session = Depends(get_session)):
+    # Anyone can see properties (no auth required)
+    properties = session.exec(select(Property)).all()
+    return [p.model_dump() for p in properties]
+
+@app.post("/api/v1/applications", status_code=201)
+def create_application(data: ApplicationCreate, user: dict = Depends(get_current_user), session: Session = Depends(get_session)):
+    # Check if already applied
+    existing = session.exec(select(TenantApplication).where(TenantApplication.property_id == data.property_id, TenantApplication.tenant_id == user["user_id"])).first()
+    if existing:
+        raise HTTPException(status_code=400, detail="You have already applied for this property")
+
+    new_app = TenantApplication(
+        property_id=data.property_id,
+        tenant_id=user["user_id"],
+        message=data.message,
+        status="pending"
+    )
+    session.add(new_app)
+    session.commit()
+    session.refresh(new_app)
+    return {"message": "Application submitted successfully!", "application": new_app.model_dump()}
+
+@app.get("/api/v1/landlord/applications")
+def get_landlord_applications(user: dict = Depends(get_current_user), session: Session = Depends(get_session)):
+    # Get all properties owned by this landlord
+    my_properties = session.exec(select(Property).where(Property.landlord_id == user["user_id"])).all()
+    my_property_ids = [p.id for p in my_properties]
+    
+    if not my_property_ids:
+        return []
+
+    # Get applications for these properties
+    applications = session.exec(select(TenantApplication).where(TenantApplication.property_id.in_(my_property_ids))).all()
+    
+    # Enrich with property title for the frontend
+    result = []
+    for app in applications:
+        prop = next((p for p in my_properties if p.id == app.property_id), None)
+        app_dict = app.model_dump()
+        app_dict["property_title"] = prop.title if prop else "Unknown Property"
+        result.append(app_dict)
+        
+    return result
+
+@app.patch("/api/v1/landlord/applications/{application_id}")
+def update_application_status(application_id: str, data: ApplicationUpdate, user: dict = Depends(get_current_user), session: Session = Depends(get_session)):
+    app = session.get(TenantApplication, application_id)
+    if not app:
+        raise HTTPException(status_code=404, detail="Application not found")
+        
+    # Verify ownership
+    prop = session.get(Property, app.property_id)
+    if not prop or prop.landlord_id != user["user_id"]:
+        raise HTTPException(status_code=403, detail="Not authorized to manage this application")
+        
+    app.status = data.status
+    session.add(app)
+    session.commit()
+    session.refresh(app)
+    return {"message": f"Application {data.status}", "application": app.model_dump()}
