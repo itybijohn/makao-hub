@@ -66,7 +66,7 @@
                 <div class="flex items-center justify-between h-16">
                     <span class="text-xl font-bold">Makao Hub</span>
                     <div class="flex items-center space-x-4">
-                        <span id="user-role-display" class="text-sm bg-indigo-700 px-3 py-1 rounded-full"></span>
+                        <span id="user-role-display" class="text-sm bg-indigo-800 px-3 py-1 rounded-full uppercase tracking-wide"></span>
                         <button onclick="logout()" class="bg-indigo-800 hover:bg-indigo-900 px-4 py-2 rounded-md text-sm font-medium">Logout</button>
                     </div>
                 </div>
@@ -115,7 +115,6 @@
         const API = ''; // Relative URL
         let currentUserRole = 'landlord';
 
-        // --- AUTH LOGIC ---
         window.addEventListener('DOMContentLoaded', () => {
             const token = localStorage.getItem('makao_token');
             currentUserRole = localStorage.getItem('makao_role') || 'landlord';
@@ -149,26 +148,28 @@
                 const res = await fetch(`${API}/api/v1/auth/login`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(data) });
                 if (!res.ok) throw new Error('Invalid credentials');
                 const result = await res.json();
+                
+                // CRITICAL FIX: Saving the role returned from the backend!
                 localStorage.setItem('makao_token', result.access_token);
-                // Note: We aren't returning role in login yet, so we default to landlord or check a profile endpoint later. 
-                // For now, we'll just use the stored role or default.
+                localStorage.setItem('makao_role', result.role);
+                currentUserRole = result.role;
+                
                 showDashboard();
             } catch (err) { document.getElementById('error-msg').textContent = err.message; document.getElementById('error-msg').classList.remove('hidden'); }
         });
 
         function logout() { localStorage.clear(); location.reload(); }
 
-        // --- DASHBOARD LOGIC ---
         function showDashboard() {
             document.getElementById('auth-view').classList.add('hidden');
             document.getElementById('dashboard-view').classList.remove('hidden');
-            document.getElementById('user-role-display').textContent = currentUserRole.toUpperCase();
+            document.getElementById('user-role-display').textContent = currentUserRole;
             
-            // Setup tabs based on role
             if (currentUserRole === 'tenant') {
                 document.getElementById('tab-properties').style.display = 'none';
                 switchTab('browse');
             } else {
+                document.getElementById('tab-properties').style.display = 'block';
                 switchTab('properties');
             }
         }
@@ -179,15 +180,16 @@
             
             document.getElementById(`view-${tabName}`).classList.remove('hidden');
             const btn = document.getElementById(`tab-${tabName}`);
-            btn.classList.add('border-b-2', 'border-indigo-600', 'text-indigo-600', 'font-medium');
-            btn.classList.remove('text-gray-500');
+            if(btn) {
+                btn.classList.add('border-b-2', 'border-indigo-600', 'text-indigo-600', 'font-medium');
+                btn.classList.remove('text-gray-500');
+            }
 
             if (tabName === 'properties') loadMyProperties();
             if (tabName === 'browse') loadBrowseProperties();
             if (tabName === 'applications') loadApplications();
         }
 
-        // --- DATA FETCHING ---
         async function loadMyProperties() {
             const token = localStorage.getItem('makao_token');
             const res = await fetch(`${API}/api/v1/dashboard/landlord`, { headers: { 'Authorization': `Bearer ${token}` } });
@@ -196,25 +198,22 @@
         }
 
         async function loadBrowseProperties() {
-            const res = await fetch(`${API}/api/v1/properties`); // Public endpoint
+            const res = await fetch(`${API}/api/v1/properties`);
             const data = await res.json();
             renderGrid('browse-properties-grid', data, true);
         }
 
         async function loadApplications() {
             const token = localStorage.getItem('makao_token');
-            let apps = [];
             if (currentUserRole === 'landlord') {
                 const res = await fetch(`${API}/api/v1/landlord/applications`, { headers: { 'Authorization': `Bearer ${token}` } });
-                apps = await res.json();
-                renderLandlordApps(apps);
+                renderLandlordApps(await res.json());
             } else {
-                // For tenant, we'd need a tenant applications endpoint. For now, show a placeholder.
-                document.getElementById('applications-list').innerHTML = '<p class="text-gray-500">Tenant application history coming soon!</p>';
+                const res = await fetch(`${API}/api/v1/tenant/applications`, { headers: { 'Authorization': `Bearer ${token}` } });
+                renderTenantApps(await res.json());
             }
         }
 
-        // --- RENDERING ---
         function renderGrid(containerId, properties, isBrowseMode) {
             const container = document.getElementById(containerId);
             container.innerHTML = properties.length ? '' : '<p class="text-gray-500 col-span-3 text-center">No properties found.</p>';
@@ -256,7 +255,22 @@
             });
         }
 
-        // --- ACTIONS ---
+        function renderTenantApps(apps) {
+            const container = document.getElementById('applications-list');
+            container.innerHTML = apps.length ? '' : '<p class="text-gray-500">You haven\'t applied to any properties yet.</p>';
+            apps.forEach(app => {
+                const div = document.createElement('div');
+                div.className = 'bg-white p-4 rounded-lg shadow flex justify-between items-center';
+                div.innerHTML = `
+                    <div>
+                        <p class="font-bold">${app.property_title}</p>
+                        <p class="text-xs mt-1">Status: <span class="font-semibold ${app.status === 'pending' ? 'text-yellow-600' : app.status === 'approved' ? 'text-green-600' : 'text-red-600'}">${app.status}</span></p>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
         async function applyForProperty(propertyId) {
             const token = localStorage.getItem('makao_token');
             const message = prompt("Send a message to the landlord:");
@@ -280,7 +294,7 @@
                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
                 body: JSON.stringify({ status })
             });
-            loadApplications(); // Refresh list
+            loadApplications();
         }
 
         document.getElementById('add-property-form').addEventListener('submit', async (e) => {
