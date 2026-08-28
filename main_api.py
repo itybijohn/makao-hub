@@ -97,16 +97,11 @@ def landlord_dashboard(user: dict = Depends(get_current_user), session: Session 
     applications = session.exec(select(TenantApplication).where(TenantApplication.status == "pending")).all()
     balance_obj = session.exec(select(UserBalance).where(UserBalance.user_id == user["user_id"])).first()
     balance = balance_obj.balance if balance_obj else 0.0
-    
-    # Count unread applications for notification
-    unread_count = len([a for a in applications if a.status == "pending"])
-    
     return {
         "user": user,
         "my_properties": [p.model_dump() for p in properties],
         "pending_applications": [a.model_dump() for a in applications],
         "real_balance": balance,
-        "unread_notifications": unread_count,
         "message": "Live data pulled from database"
     }
 
@@ -200,19 +195,6 @@ def update_application_status(application_id: str, data: ApplicationUpdate, user
     session.commit()
     session.refresh(app)
     return {"message": f"Application {data.status}", "application": app.model_dump()}
-
-# --- NOTIFICATION ENDPOINT ---
-@app.get("/api/v1/notifications/unread")
-def get_unread_notifications(user: dict = Depends(get_current_user), session: Session = Depends(get_session)):
-    if user["role"] == "landlord":
-        my_properties = session.exec(select(Property).where(Property.landlord_id == user["user_id"])).all()
-        my_property_ids = [p.id for p in my_properties]
-        if not my_property_ids:
-            return {"unread_count": 0}
-        unread = session.exec(select(TenantApplication).where(TenantApplication.property_id.in_(my_property_ids), TenantApplication.status == "pending")).all()
-        return {"unread_count": len(unread)}
-    else:
-        return {"unread_count": 0}
 
 # --- SERVE FRONTEND ---
 @app.get("/")

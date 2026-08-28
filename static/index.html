@@ -58,13 +58,27 @@
 
     <!-- MAIN DASHBOARD VIEW -->
     <div id="dashboard-view" class="hidden min-h-screen">
-        <nav class="bg-indigo-600 text-white shadow-lg">
+        <!-- LANDLORD THEME: Indigo/Blue -->
+        <nav id="landlord-nav" class="bg-indigo-600 text-white shadow-lg hidden">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="flex items-center justify-between h-16">
-                    <span class="text-xl font-bold">Makao Hub</span>
+                    <span class="text-xl font-bold">Makao Hub - Landlord</span>
                     <div class="flex items-center space-x-4">
-                        <span id="user-role-display" class="text-sm bg-indigo-800 px-3 py-1 rounded-full uppercase tracking-wide"></span>
+                        <span id="landlord-badge" class="text-sm bg-indigo-800 px-3 py-1 rounded-full uppercase tracking-wide">Landlord</span>
                         <button onclick="logout()" class="bg-indigo-800 hover:bg-indigo-900 px-4 py-2 rounded-md text-sm font-medium">Logout</button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- TENANT THEME: Green/Teal -->
+        <nav id="tenant-nav" class="bg-emerald-600 text-white shadow-lg hidden">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex items-center justify-between h-16">
+                    <span class="text-xl font-bold">Makao Hub - Tenant</span>
+                    <div class="flex items-center space-x-4">
+                        <span id="tenant-badge" class="text-sm bg-emerald-800 px-3 py-1 rounded-full uppercase tracking-wide">Tenant</span>
+                        <button onclick="logout()" class="bg-emerald-800 hover:bg-emerald-900 px-4 py-2 rounded-md text-sm font-medium">Logout</button>
                     </div>
                 </div>
             </div>
@@ -187,30 +201,31 @@
         function showDashboard() {
             document.getElementById('auth-view').classList.add('hidden');
             document.getElementById('dashboard-view').classList.remove('hidden');
-            document.getElementById('user-role-display').textContent = currentUserRole;
             
+            // Apply theme based on role
             if (currentUserRole === 'tenant') {
+                document.getElementById('tenant-nav').classList.remove('hidden');
+                document.getElementById('landlord-nav').classList.add('hidden');
                 document.getElementById('tab-properties').style.display = 'none';
                 switchTab('browse');
             } else {
+                document.getElementById('landlord-nav').classList.remove('hidden');
+                document.getElementById('tenant-nav').classList.add('hidden');
                 document.getElementById('tab-properties').style.display = 'block';
                 switchTab('properties');
             }
             
-            // Check for unread notifications
             checkNotifications();
         }
 
         async function checkNotifications() {
             if (currentUserRole !== 'landlord') return;
-            
             const token = localStorage.getItem('makao_token');
             try {
                 const res = await fetch(`${API}/api/v1/notifications/unread`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 const data = await res.json();
-                
                 const badge = document.getElementById('notification-badge');
                 if (data.unread_count > 0) {
                     badge.textContent = data.unread_count;
@@ -218,10 +233,9 @@
                     badge.classList.add('flex');
                 } else {
                     badge.classList.add('hidden');
-                    badge.classList.remove('flex');
                 }
             } catch (err) {
-                console.error('Failed to check notifications:', err);
+                console.error('Notification check failed', err);
             }
         }
 
@@ -242,10 +256,7 @@
             if (tabName === 'browse') loadBrowseProperties();
             if (tabName === 'applications') {
                 loadApplications();
-                // Clear notification badge when viewing applications
-                const badge = document.getElementById('notification-badge');
-                badge.classList.add('hidden');
-                badge.classList.remove('flex');
+                document.getElementById('notification-badge').classList.add('hidden');
             }
         }
 
@@ -290,7 +301,7 @@
                     <p class="text-gray-600 text-sm">📍 ${p.location}</p>
                     <p class="text-indigo-600 font-bold mt-2">KES ${p.rent_amount.toLocaleString()}/mo</p>
                     <p class="text-sm text-gray-500 mt-2">${p.description || ''}</p>
-                    ${isBrowseMode ? `<button onclick="applyForProperty('${p.id}')" class="mt-4 w-full bg-indigo-600 text-white py-2 rounded hover:bg-indigo-700">Apply Now</button>` : ''}
+                    ${isBrowseMode ? `<button onclick="applyForProperty('${p.id}')" class="mt-4 w-full bg-emerald-600 text-white py-2 rounded hover:bg-emerald-700">Apply Now</button>` : ''}
                 `;
                 container.appendChild(card);
             });
@@ -360,7 +371,7 @@
                 body: JSON.stringify({ status })
             });
             loadApplications();
-            checkNotifications(); // Refresh notification count
+            checkNotifications();
         }
 
         document.getElementById('add-property-form').addEventListener('submit', async (e) => {
