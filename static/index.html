@@ -104,40 +104,91 @@
         </nav>
 
         <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <div class="flex space-x-4 mb-8 border-b border-gray-200">
-                <button onclick="switchTab('properties')" id="tab-properties" class="tab-btn py-2 px-4 border-b-2 border-indigo-600 text-indigo-600 font-medium">My Properties</button>
-                <button onclick="switchTab('browse')" id="tab-browse" class="tab-btn py-2 px-4 text-gray-500 hover:text-gray-700">Browse Homes</button>
-                <button onclick="switchTab('applications')" id="tab-applications" class="tab-btn py-2 px-4 text-gray-500 hover:text-gray-700 relative">
-                    Applications
-                    <span id="notification-badge" class="hidden absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center"></span>
-                </button>
+            <!-- LANDLORD TABS -->
+            <div id="landlord-tabs" class="hidden">
+                <div class="flex space-x-4 mb-8 border-b border-gray-200">
+                    <button onclick="switchTab('properties')" id="tab-properties" class="tab-btn py-2 px-4 border-b-2 border-indigo-600 text-indigo-600 font-medium">My Properties</button>
+                    <button onclick="switchTab('add-property')" id="tab-add-property" class="tab-btn py-2 px-4 text-gray-500 hover:text-gray-700">Add Property</button>
+                    <button onclick="switchTab('browse')" id="tab-browse" class="tab-btn py-2 px-4 text-gray-500 hover:text-gray-700">Browse Homes</button>
+                    <button onclick="switchTab('applications')" id="tab-applications" class="tab-btn py-2 px-4 text-gray-500 hover:text-gray-700 relative">
+                        Applications
+                        <span id="notification-badge" class="hidden absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center"></span>
+                    </button>
+                </div>
             </div>
 
-            <div id="view-properties" class="tab-content">
-                <div class="bg-white p-6 rounded-lg shadow-md mb-8">
-                    <h3 class="text-lg font-semibold text-gray-800 mb-4">Add New Property</h3>
-                    <form id="add-property-form" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <input type="text" id="prop-title" placeholder="Title (e.g. 2BR in Kilimani)" class="px-3 py-2 border rounded-md" required>
-                        <input type="text" id="prop-location" placeholder="Location" class="px-3 py-2 border rounded-md" required>
-                        <input type="number" id="prop-rent" placeholder="Rent (KES)" class="px-3 py-2 border rounded-md" required>
-                        <input type="number" id="prop-beds" placeholder="Bedrooms" class="px-3 py-2 border rounded-md" required>
-                        <input type="text" id="prop-image" placeholder="Image URL (optional)" class="md:col-span-2 px-3 py-2 border rounded-md">
-                        <div class="grid grid-cols-2 gap-4 md:col-span-2">
-                            <input type="number" step="any" id="prop-lat" placeholder="Latitude (e.g., -1.2921)" class="px-3 py-2 border rounded-md">
-                            <input type="number" step="any" id="prop-lng" placeholder="Longitude (e.g., 36.8219)" class="px-3 py-2 border rounded-md">
-                        </div>
-                        <textarea id="prop-description" placeholder="Description" rows="2" class="md:col-span-2 px-3 py-2 border rounded-md"></textarea>
-                        <button type="submit" class="md:col-span-2 bg-green-600 text-white py-2 rounded-md hover:bg-green-700">+ Add Property</button>
-                    </form>
+            <!-- TENANT TABS -->
+            <div id="tenant-tabs" class="hidden">
+                <div class="flex space-x-4 mb-8 border-b border-gray-200">
+                    <button onclick="switchTab('browse')" id="tab-browse-tenant" class="tab-btn py-2 px-4 border-b-2 border-emerald-600 text-emerald-600 font-medium">Browse Homes</button>
+                    <button onclick="switchTab('applications')" id="tab-applications-tenant" class="tab-btn py-2 px-4 text-gray-500 hover:text-gray-700 relative">
+                        My Applications
+                        <span id="tenant-notification-badge" class="hidden absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center"></span>
+                    </button>
                 </div>
+            </div>
+
+            <!-- TAB 1: MY PROPERTIES (Landlord) -->
+            <div id="view-properties" class="tab-content hidden">
+                <h2 class="text-2xl font-bold text-gray-900 mb-6">My Properties</h2>
                 <div id="my-properties-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
             </div>
 
+            <!-- TAB 2: ADD PROPERTY (Landlord) -->
+            <div id="view-add-property" class="tab-content hidden">
+                <div class="max-w-3xl mx-auto">
+                    <div class="bg-white p-8 rounded-lg shadow-md">
+                        <h2 class="text-2xl font-bold text-gray-900 mb-6">Add New Property</h2>
+                        <form id="add-property-form" class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Property Title</label>
+                                <input type="text" id="prop-title" placeholder="e.g. 2BR in Kilimani" class="w-full px-3 py-2 border rounded-md" required>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Location</label>
+                                <input type="text" id="prop-location" placeholder="e.g. Kilimani, Nairobi" class="w-full px-3 py-2 border rounded-md" required>
+                            </div>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Rent (KES)</label>
+                                    <input type="number" id="prop-rent" placeholder="30000" class="w-full px-3 py-2 border rounded-md" required>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Bedrooms</label>
+                                    <input type="number" id="prop-beds" placeholder="2" class="w-full px-3 py-2 border rounded-md" required>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Image URL (optional)</label>
+                                <input type="text" id="prop-image" placeholder="https://..." class="w-full px-3 py-2 border rounded-md">
+                            </div>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Latitude</label>
+                                    <input type="number" step="any" id="prop-lat" placeholder="-1.2921" class="w-full px-3 py-2 border rounded-md">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Longitude</label>
+                                    <input type="number" step="any" id="prop-lng" placeholder="36.8219" class="w-full px-3 py-2 border rounded-md">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                                <textarea id="prop-description" placeholder="Describe your property..." rows="3" class="w-full px-3 py-2 border rounded-md"></textarea>
+                            </div>
+                            <button type="submit" class="w-full bg-green-600 text-white py-3 rounded-md hover:bg-green-700 font-medium">+ Add Property</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 3: BROWSE HOMES (Both) -->
             <div id="view-browse" class="tab-content hidden">
                 <h2 class="text-2xl font-bold text-gray-900 mb-6">Available Properties</h2>
                 <div id="browse-properties-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
             </div>
 
+            <!-- TAB 4: APPLICATIONS (Both) -->
             <div id="view-applications" class="tab-content hidden">
                 <h2 class="text-2xl font-bold text-gray-900 mb-6">Applications</h2>
                 <div id="applications-list" class="space-y-4"></div>
@@ -260,7 +311,7 @@
             const toast = document.createElement('div');
             toast.className = `notification-toast bg-white rounded-lg shadow-lg p-4 mb-2 flex items-center space-x-3 ${type === 'success' ? 'border-l-4 border-green-500' : type === 'error' ? 'border-l-4 border-red-500' : 'border-l-4 border-blue-500'}`;
             
-            const icon = type === 'success' ? '✅' : type === 'error' ? '❌' : '️';
+            const icon = type === 'success' ? '✅' : type === 'error' ? '' : '🔔';
             
             toast.innerHTML = `
                 <span class="text-2xl">${icon}</span>
@@ -323,36 +374,58 @@
         function showDashboard() {
             document.getElementById('auth-view').classList.add('hidden');
             document.getElementById('dashboard-view').classList.remove('hidden');
+            
             if (currentUserRole === 'tenant') {
                 document.getElementById('tenant-nav').classList.remove('hidden');
                 document.getElementById('landlord-nav').classList.add('hidden');
-                document.getElementById('tab-properties').style.display = 'none';
+                document.getElementById('landlord-tabs').classList.add('hidden');
+                document.getElementById('tenant-tabs').classList.remove('hidden');
                 switchTab('browse');
             } else {
                 document.getElementById('landlord-nav').classList.remove('hidden');
                 document.getElementById('tenant-nav').classList.add('hidden');
-                document.getElementById('tab-properties').style.display = 'block';
+                document.getElementById('landlord-tabs').classList.remove('hidden');
+                document.getElementById('tenant-tabs').classList.add('hidden');
                 switchTab('properties');
             }
             checkNotifications();
         }
 
         async function checkNotifications() {
-            if (currentUserRole !== 'landlord') return;
             const token = localStorage.getItem('makao_token');
             try {
-                const res = await fetch(`${API}/api/v1/landlord/applications`, { headers: { 'Authorization': `Bearer ${token}` } });
+                const res = await fetch(`${API}/api/v1/${currentUserRole}/applications`, { headers: { 'Authorization': `Bearer ${token}` } });
                 if(res.ok) {
                     const data = await res.json();
                     const pendingCount = data.filter(app => app.status === 'pending').length;
-                    const badge = document.getElementById('notification-badge');
-                    if (pendingCount > 0) {
-                        badge.textContent = pendingCount;
-                        badge.classList.remove('hidden');
-                        badge.classList.add('flex');
-                        showNotification(`You have ${pendingCount} new application(s)!`, 'info');
+                    const approvedCount = data.filter(app => app.status === 'approved').length;
+                    
+                    if (currentUserRole === 'landlord') {
+                        const badge = document.getElementById('notification-badge');
+                        if (pendingCount > 0) {
+                            badge.textContent = pendingCount;
+                            badge.classList.remove('hidden');
+                            badge.classList.add('flex');
+                            showNotification(`You have ${pendingCount} new application(s)!`, 'info');
+                        } else {
+                            badge.classList.add('hidden');
+                        }
                     } else {
-                        badge.classList.add('hidden');
+                        // TENANT NOTIFICATIONS
+                        const badge = document.getElementById('tenant-notification-badge');
+                        if (approvedCount > 0) {
+                            badge.textContent = approvedCount;
+                            badge.classList.remove('hidden');
+                            badge.classList.add('flex');
+                            showNotification(`Great news! ${approvedCount} application(s) approved!`, 'success');
+                        } else if (pendingCount > 0) {
+                            badge.textContent = pendingCount;
+                            badge.classList.remove('hidden');
+                            badge.classList.add('flex');
+                            showNotification(`You have ${pendingCount} pending application(s)`, 'info');
+                        } else {
+                            badge.classList.add('hidden');
+                        }
                     }
                 }
             } catch (err) { console.error('Notification check failed', err); }
@@ -360,13 +433,31 @@
 
         function switchTab(tabName) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
-            document.querySelectorAll('.tab-btn').forEach(el => { el.classList.remove('border-b-2', 'border-indigo-600', 'text-indigo-600', 'font-medium'); el.classList.add('text-gray-500'); });
+            document.querySelectorAll('.tab-btn').forEach(el => { 
+                el.classList.remove('border-b-2', 'border-indigo-600', 'text-indigo-600', 'font-medium', 'border-emerald-600', 'text-emerald-600'); 
+                el.classList.add('text-gray-500'); 
+            });
             document.getElementById(`view-${tabName}`).classList.remove('hidden');
-            const btn = document.getElementById(`tab-${tabName}`);
-            if(btn) { btn.classList.add('border-b-2', 'border-indigo-600', 'text-indigo-600', 'font-medium'); btn.classList.remove('text-gray-500'); }
+            
+            // Update active tab styling
+            const activeBtn = document.getElementById(`tab-${tabName}`);
+            if(activeBtn) { 
+                const themeClass = currentUserRole === 'tenant' ? 'border-emerald-600 text-emerald-600' : 'border-indigo-600 text-indigo-600';
+                activeBtn.classList.add('border-b-2', themeClass, 'font-medium'); 
+                activeBtn.classList.remove('text-gray-500'); 
+            }
+            
             if (tabName === 'properties') loadMyProperties();
+            if (tabName === 'add-property') {
+                // Just show the form, no data loading needed
+            }
             if (tabName === 'browse') loadBrowseProperties();
-            if (tabName === 'applications') { loadApplications(); document.getElementById('notification-badge').classList.add('hidden'); }
+            if (tabName === 'applications') { 
+                loadApplications(); 
+                // Clear notification badge when viewing applications
+                document.getElementById('notification-badge')?.classList.add('hidden');
+                document.getElementById('tenant-notification-badge')?.classList.add('hidden');
+            }
         }
 
         async function loadMyProperties() {
@@ -436,8 +527,8 @@
                     } else {
                         // LANDLORD SEES: View Reviews & Manage Tours
                         actionButtons = `
-                            <button onclick="viewPropertyReviews('${p.id}', '${p.title}')" class="w-full bg-indigo-100 text-indigo-700 py-2 rounded hover:bg-indigo-200 mb-2 font-medium">📋 View Reviews</button>
-                            <button onclick="showPropertyTours('${p.id}')" class="w-full bg-blue-100 text-blue-700 py-2 rounded hover:bg-blue-200 text-sm font-medium">📅 Manage Tours</button>
+                            <button onclick="viewPropertyReviews('${p.id}', '${p.title}')" class="w-full bg-indigo-100 text-indigo-700 py-2 rounded hover:bg-indigo-200 mb-2 font-medium"> View Reviews</button>
+                            <button onclick="showPropertyTours('${p.id}')" class="w-full bg-blue-100 text-blue-700 py-2 rounded hover:bg-blue-200 text-sm font-medium"> Manage Tours</button>
                         `;
                     }
                 }
@@ -470,7 +561,7 @@
                     <div>
                         <p class="font-bold">${app.property_title}</p>
                         <p class="text-sm text-gray-600">Message: "${app.message}"</p>
-                        ${app.booking_date ? `<p class="text-xs text-indigo-600 mt-1"> Booked: ${app.booking_date} at ${app.booking_time}</p>` : ''}
+                        ${app.booking_date ? `<p class="text-xs text-indigo-600 mt-1">📅 Booked: ${app.booking_date} at ${app.booking_time}</p>` : ''}
                         <p class="text-xs mt-1">Status: <span class="font-semibold ${app.status === 'pending' ? 'text-yellow-600' : app.status === 'approved' ? 'text-green-600' : 'text-red-600'}">${app.status}</span></p>
                     </div>
                     ${app.status === 'pending' ? `
@@ -705,6 +796,8 @@
             });
             showNotification('Property added successfully!', 'success');
             e.target.reset();
+            // Redirect to My Properties tab
+            switchTab('properties');
             loadMyProperties();
         });
 
