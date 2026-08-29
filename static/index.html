@@ -29,7 +29,6 @@
     </style>
 </head>
 <body class="bg-gray-50 text-gray-800 font-sans">
-    <!-- NOTIFICATION CONTAINER -->
     <div id="notification-container"></div>
 
     <div id="auth-view" class="min-h-screen flex items-center justify-center p-4">
@@ -79,12 +78,10 @@
     </div>
 
     <div id="dashboard-view" class="hidden min-h-screen">
-        <!-- LANDLORD NAV -->
         <nav id="landlord-nav" class="bg-indigo-600 text-white shadow-lg hidden">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="flex items-center justify-between h-16">
                     <div class="flex items-center">
-                        <!-- BACK BUTTON -->
                         <button onclick="goBack()" class="mr-3 text-white hover:text-gray-200 focus:outline-none" title="Go Back">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
@@ -100,12 +97,10 @@
             </div>
         </nav>
 
-        <!-- TENANT NAV -->
         <nav id="tenant-nav" class="bg-emerald-600 text-white shadow-lg hidden">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="flex items-center justify-between h-16">
                     <div class="flex items-center">
-                        <!-- BACK BUTTON -->
                         <button onclick="goBack()" class="mr-3 text-white hover:text-gray-200 focus:outline-none" title="Go Back">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
@@ -122,7 +117,6 @@
         </nav>
 
         <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <!-- LANDLORD TABS -->
             <div id="landlord-tabs" class="hidden">
                 <div class="flex space-x-4 mb-8 border-b border-gray-200">
                     <button onclick="switchTab('properties')" id="tab-properties" class="tab-btn py-2 px-4 border-b-2 border-indigo-600 text-indigo-600 font-medium">My Properties</button>
@@ -135,7 +129,6 @@
                 </div>
             </div>
 
-            <!-- TENANT TABS -->
             <div id="tenant-tabs" class="hidden">
                 <div class="flex space-x-4 mb-8 border-b border-gray-200">
                     <button onclick="switchTab('browse')" id="tab-browse-tenant" class="tab-btn py-2 px-4 border-b-2 border-emerald-600 text-emerald-600 font-medium">Browse Homes</button>
@@ -146,13 +139,11 @@
                 </div>
             </div>
 
-            <!-- TAB 1: MY PROPERTIES (Landlord) -->
             <div id="view-properties" class="tab-content hidden">
                 <h2 class="text-2xl font-bold text-gray-900 mb-6">My Properties</h2>
                 <div id="my-properties-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
             </div>
 
-            <!-- TAB 2: ADD PROPERTY (Landlord) -->
             <div id="view-add-property" class="tab-content hidden">
                 <div class="max-w-3xl mx-auto">
                     <div class="bg-white p-8 rounded-lg shadow-md">
@@ -200,13 +191,11 @@
                 </div>
             </div>
 
-            <!-- TAB 3: BROWSE HOMES (Both) -->
             <div id="view-browse" class="tab-content hidden">
                 <h2 class="text-2xl font-bold text-gray-900 mb-6">Available Properties</h2>
                 <div id="browse-properties-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
             </div>
 
-            <!-- TAB 4: APPLICATIONS (Both) -->
             <div id="view-applications" class="tab-content hidden">
                 <h2 class="text-2xl font-bold text-gray-900 mb-6">Applications</h2>
                 <div id="applications-list" class="space-y-4"></div>
@@ -214,7 +203,6 @@
         </main>
     </div>
 
-    <!-- REVIEW MODAL -->
     <div id="review-modal" class="fixed inset-0 modal-backdrop hidden flex items-center justify-center z-50 p-4">
         <div class="bg-white rounded-xl shadow-2xl w-full max-w-lg overflow-hidden">
             <div class="bg-indigo-600 p-4 flex justify-between items-center">
@@ -223,7 +211,6 @@
             </div>
             <div class="p-6">
                 <p class="text-sm text-gray-600 mb-4">Select tags that describe your experience.</p>
-                
                 <div class="mb-4">
                     <label class="block text-sm font-medium text-gray-700 mb-2">Time Management</label>
                     <div class="flex flex-wrap gap-2">
@@ -232,7 +219,6 @@
                         <button type="button" class="tag-btn px-3 py-1 rounded-full border border-gray-300 text-sm" onclick="toggleTag(this, 'Very slow')">Very slow</button>
                     </div>
                 </div>
-
                 <div class="mb-4">
                     <label class="block text-sm font-medium text-gray-700 mb-2">Value for Money</label>
                     <div class="flex flex-wrap gap-2">
@@ -241,7 +227,6 @@
                         <button type="button" class="tag-btn px-3 py-1 rounded-full border border-gray-300 text-sm" onclick="toggleTag(this, 'Overpriced')">Overpriced</button>
                     </div>
                 </div>
-
                 <div class="mb-4">
                     <label class="block text-sm font-medium text-gray-700 mb-2">Professionalism</label>
                     <div class="flex flex-wrap gap-2">
@@ -250,31 +235,25 @@
                         <button type="button" class="tag-btn px-3 py-1 rounded-full border border-gray-300 text-sm" onclick="toggleTag(this, 'Arrogant')">Arrogant</button>
                     </div>
                 </div>
-
                 <div class="mb-4">
                     <label class="block text-sm font-medium text-gray-700 mb-1">Additional Comments (Optional)</label>
                     <textarea id="review-comment" rows="2" class="w-full px-3 py-2 border rounded-md" placeholder="Share more details..."></textarea>
                 </div>
-
                 <button onclick="submitReview()" class="w-full bg-indigo-600 text-white py-2 rounded-md hover:bg-indigo-700 font-medium">Submit Review</button>
             </div>
         </div>
     </div>
 
-    <!-- VIEW REVIEWS MODAL (Landlord) -->
     <div id="view-reviews-modal" class="fixed inset-0 modal-backdrop hidden flex items-center justify-center z-50 p-4">
         <div class="bg-white rounded-xl shadow-2xl w-full max-w-2xl overflow-hidden">
             <div class="bg-indigo-600 p-4 flex justify-between items-center">
                 <h3 class="text-white font-bold text-lg">Property Reviews</h3>
                 <button onclick="closeViewReviewsModal()" class="text-white hover:text-gray-200 text-2xl">&times;</button>
             </div>
-            <div class="p-6 max-h-96 overflow-y-auto" id="reviews-content">
-                <!-- Reviews loaded here -->
-            </div>
+            <div class="p-6 max-h-96 overflow-y-auto" id="reviews-content"></div>
         </div>
     </div>
 
-    <!-- BOOKING MODAL -->
     <div id="booking-modal" class="fixed inset-0 modal-backdrop hidden flex items-center justify-center z-50 p-4">
         <div class="bg-white rounded-xl shadow-2xl w-full max-w-lg overflow-hidden">
             <div class="bg-indigo-600 p-4 flex justify-between items-center">
@@ -317,8 +296,6 @@
         let bookedSlots = [];
         let selectedTags = [];
         let currentPropertyTitle = '';
-        
-        // --- NEW: TAB HISTORY TRACKING ---
         let tabHistory = [];
         let activeTabName = '';
 
@@ -332,9 +309,7 @@
             const container = document.getElementById('notification-container');
             const toast = document.createElement('div');
             toast.className = `notification-toast bg-white rounded-lg shadow-lg p-4 mb-2 flex items-center space-x-3 ${type === 'success' ? 'border-l-4 border-green-500' : type === 'error' ? 'border-l-4 border-red-500' : 'border-l-4 border-blue-500'}`;
-            
             const icon = type === 'success' ? '✅' : type === 'error' ? '❌' : '🔔';
-            
             toast.innerHTML = `
                 <span class="text-2xl">${icon}</span>
                 <div>
@@ -342,12 +317,8 @@
                     <p class="text-sm text-gray-600">${message}</p>
                 </div>
             `;
-            
             container.appendChild(toast);
-            
-            setTimeout(() => {
-                toast.remove();
-            }, 5000);
+            setTimeout(() => { toast.remove(); }, 5000);
         }
 
         function showRegister() { document.getElementById('login-form').classList.add('hidden'); document.getElementById('register-form').classList.remove('hidden'); }
@@ -393,13 +364,11 @@
             setTimeout(() => location.reload(), 500);
         }
 
-        // --- NEW: BACK BUTTON FUNCTION ---
         function goBack() {
             if (tabHistory.length > 0) {
                 const prevTab = tabHistory.pop();
                 switchTab(prevTab);
             } else {
-                // Fallback if no history
                 const defaultTab = currentUserRole === 'tenant' ? 'browse' : 'properties';
                 switchTab(defaultTab);
             }
@@ -408,11 +377,8 @@
         function showDashboard() {
             document.getElementById('auth-view').classList.add('hidden');
             document.getElementById('dashboard-view').classList.remove('hidden');
-            
-            // Reset history on login
             tabHistory = [];
             activeTabName = '';
-
             if (currentUserRole === 'tenant') {
                 document.getElementById('tenant-nav').classList.remove('hidden');
                 document.getElementById('landlord-nav').classList.add('hidden');
@@ -445,11 +411,8 @@
                             badge.classList.remove('hidden');
                             badge.classList.add('flex');
                             showNotification(`You have ${pendingCount} new application(s)!`, 'info');
-                        } else {
-                            badge.classList.add('hidden');
-                        }
+                        } else { badge.classList.add('hidden'); }
                     } else {
-                        // TENANT NOTIFICATIONS
                         const badge = document.getElementById('tenant-notification-badge');
                         if (approvedCount > 0) {
                             badge.textContent = approvedCount;
@@ -461,44 +424,31 @@
                             badge.classList.remove('hidden');
                             badge.classList.add('flex');
                             showNotification(`You have ${pendingCount} pending application(s)`, 'info');
-                        } else {
-                            badge.classList.add('hidden');
-                        }
+                        } else { badge.classList.add('hidden'); }
                     }
                 }
             } catch (err) { console.error('Notification check failed', err); }
         }
 
         function switchTab(tabName) {
-            // Track history
-            if (activeTabName && activeTabName !== tabName) {
-                tabHistory.push(activeTabName);
-            }
+            if (activeTabName && activeTabName !== tabName) { tabHistory.push(activeTabName); }
             activeTabName = tabName;
-
             document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
             document.querySelectorAll('.tab-btn').forEach(el => { 
                 el.classList.remove('border-b-2', 'border-indigo-600', 'text-indigo-600', 'font-medium', 'border-emerald-600', 'text-emerald-600'); 
                 el.classList.add('text-gray-500'); 
             });
             document.getElementById(`view-${tabName}`).classList.remove('hidden');
-            
-            // Update active tab styling
             const activeBtn = document.getElementById(`tab-${tabName}`);
             if(activeBtn) { 
                 const themeClass = currentUserRole === 'tenant' ? 'border-emerald-600 text-emerald-600' : 'border-indigo-600 text-indigo-600';
                 activeBtn.classList.add('border-b-2', themeClass, 'font-medium'); 
                 activeBtn.classList.remove('text-gray-500'); 
             }
-            
             if (tabName === 'properties') loadMyProperties();
-            if (tabName === 'add-property') {
-                // Just show the form, no data loading needed
-            }
             if (tabName === 'browse') loadBrowseProperties();
             if (tabName === 'applications') { 
                 loadApplications(); 
-                // Clear notification badge when viewing applications
                 document.getElementById('notification-badge')?.classList.add('hidden');
                 document.getElementById('tenant-notification-badge')?.classList.add('hidden');
             }
@@ -531,22 +481,15 @@
         async function renderGrid(containerId, properties, isBrowseMode) {
             const container = document.getElementById(containerId);
             container.innerHTML = properties.length ? '' : '<p class="text-gray-500 col-span-3 text-center">No properties found.</p>';
-            
             for (const p of properties) {
                 const card = document.createElement('div');
                 card.className = 'bg-white rounded-lg shadow-md overflow-hidden flex flex-col';
-                
-                const imageHtml = p.image_url 
-                    ? `<img src="${p.image_url}" alt="${p.title}" class="w-full h-48 object-cover">` 
-                    : `<div class="w-full h-48 bg-gray-200 flex items-center justify-center text-gray-400">No Image Available</div>`;
-
+                const imageHtml = p.image_url ? `<img src="${p.image_url}" alt="${p.title}" class="w-full h-48 object-cover">` : `<div class="w-full h-48 bg-gray-200 flex items-center justify-center text-gray-400">No Image Available</div>`;
                 let mapButton = '';
                 if (p.latitude && p.longitude && p.latitude !== 0 && p.longitude !== 0) {
                     const mapUrl = `https://www.google.com/maps/search/?api=1&query=${p.latitude},${p.longitude}`;
                     mapButton = `<a href="${mapUrl}" target="_blank" class="block w-full text-center mt-2 bg-blue-100 text-blue-700 py-2 rounded hover:bg-blue-200 font-medium text-sm">📍 View on Map</a>`;
                 }
-
-                // Fetch reviews for this property
                 let reviewHtml = '';
                 try {
                     const res = await fetch(`${API}/api/v1/reviews/${p.id}`);
@@ -558,39 +501,15 @@
                         }
                     }
                 } catch (err) { console.error('Failed to load reviews', err); }
-
-                // ROLE-BASED ACTION BUTTONS
                 let actionButtons = '';
                 if (isBrowseMode) {
                     if (currentUserRole === 'tenant') {
-                        // TENANT SEES: Book Tour & Leave Review
-                        actionButtons = `
-                            <button onclick="openBookingModal('${p.id}', '${p.title}')" class="w-full bg-emerald-600 text-white py-2 rounded hover:bg-emerald-700 mb-2">Book Tour</button>
-                            <button onclick="openReviewModal('${p.id}')" class="w-full bg-gray-100 text-gray-700 py-2 rounded hover:bg-gray-200 text-sm font-medium">Leave a Review</button>
-                        `;
+                        actionButtons = `<button onclick="openBookingModal('${p.id}', '${p.title}')" class="w-full bg-emerald-600 text-white py-2 rounded hover:bg-emerald-700 mb-2">Book Tour</button><button onclick="openReviewModal('${p.id}')" class="w-full bg-gray-100 text-gray-700 py-2 rounded hover:bg-gray-200 text-sm font-medium">Leave a Review</button>`;
                     } else {
-                        // LANDLORD SEES: View Reviews & Manage Tours
-                        actionButtons = `
-                            <button onclick="viewPropertyReviews('${p.id}', '${p.title}')" class="w-full bg-indigo-100 text-indigo-700 py-2 rounded hover:bg-indigo-200 mb-2 font-medium">📋 View Reviews</button>
-                            <button onclick="showPropertyTours('${p.id}')" class="w-full bg-blue-100 text-blue-700 py-2 rounded hover:bg-blue-200 text-sm font-medium"> Manage Tours</button>
-                        `;
+                        actionButtons = `<button onclick="viewPropertyReviews('${p.id}', '${p.title}')" class="w-full bg-indigo-100 text-indigo-700 py-2 rounded hover:bg-indigo-200 mb-2 font-medium">📋 View Reviews</button><button onclick="showPropertyTours('${p.id}')" class="w-full bg-blue-100 text-blue-700 py-2 rounded hover:bg-blue-200 text-sm font-medium">📅 Manage Tours</button>`;
                     }
                 }
-
-                card.innerHTML = `
-                    ${imageHtml}
-                    <div class="p-6 flex-grow">
-                        <h3 class="text-lg font-bold">${p.title}</h3>
-                        <p class="text-gray-600 text-sm">📍 ${p.location}</p>
-                        <p class="text-indigo-600 font-bold mt-2">KES ${p.rent_amount.toLocaleString()}/mo</p>
-                        <p class="text-sm text-gray-500 mt-2 line-clamp-3">${p.description || ''}</p>
-                        ${reviewHtml}
-                        ${mapButton}
-                    </div>
-                    <div class="p-6 pt-0">
-                        ${actionButtons}
-                    </div>
-                `;
+                card.innerHTML = `${imageHtml}<div class="p-6 flex-grow"><h3 class="text-lg font-bold">${p.title}</h3><p class="text-gray-600 text-sm">📍 ${p.location}</p><p class="text-indigo-600 font-bold mt-2">KES ${p.rent_amount.toLocaleString()}/mo</p><p class="text-sm text-gray-500 mt-2 line-clamp-3">${p.description || ''}</p>${reviewHtml}${mapButton}</div><div class="p-6 pt-0">${actionButtons}</div>`;
                 container.appendChild(card);
             }
         }
@@ -601,20 +520,7 @@
             apps.forEach(app => {
                 const div = document.createElement('div');
                 div.className = 'bg-white p-4 rounded-lg shadow flex justify-between items-center';
-                div.innerHTML = `
-                    <div>
-                        <p class="font-bold">${app.property_title}</p>
-                        <p class="text-sm text-gray-600">Message: "${app.message}"</p>
-                        ${app.booking_date ? `<p class="text-xs text-indigo-600 mt-1">📅 Booked: ${app.booking_date} at ${app.booking_time}</p>` : ''}
-                        <p class="text-xs mt-1">Status: <span class="font-semibold ${app.status === 'pending' ? 'text-yellow-600' : app.status === 'approved' ? 'text-green-600' : 'text-red-600'}">${app.status}</span></p>
-                    </div>
-                    ${app.status === 'pending' ? `
-                        <div class="space-x-2">
-                            <button onclick="updateApp('${app.id}', 'approved', '${app.property_title}')" class="bg-green-500 text-white px-3 py-1 rounded text-sm">Approve</button>
-                            <button onclick="updateApp('${app.id}', 'rejected', '${app.property_title}')" class="bg-red-500 text-white px-3 py-1 rounded text-sm">Reject</button>
-                        </div>
-                    ` : ''}
-                `;
+                div.innerHTML = `<div><p class="font-bold">${app.property_title}</p><p class="text-sm text-gray-600">Message: "${app.message}"</p>${app.booking_date ? `<p class="text-xs text-indigo-600 mt-1">📅 Booked: ${app.booking_date} at ${app.booking_time}</p>` : ''}<p class="text-xs mt-1">Status: <span class="font-semibold ${app.status === 'pending' ? 'text-yellow-600' : app.status === 'approved' ? 'text-green-600' : 'text-red-600'}">${app.status}</span></p></div>${app.status === 'pending' ? `<div class="space-x-2"><button onclick="updateApp('${app.id}', 'approved', '${app.property_title}')" class="bg-green-500 text-white px-3 py-1 rounded text-sm">Approve</button><button onclick="updateApp('${app.id}', 'rejected', '${app.property_title}')" class="bg-red-500 text-white px-3 py-1 rounded text-sm">Reject</button></div>` : ''}`;
                 container.appendChild(div);
             });
         }
@@ -625,123 +531,61 @@
             apps.forEach(app => {
                 const div = document.createElement('div');
                 div.className = 'bg-white p-4 rounded-lg shadow flex justify-between items-center';
-                div.innerHTML = `
-                    <div>
-                        <p class="font-bold">${app.property_title}</p>
-                        ${app.booking_date ? `<p class="text-xs text-indigo-600 mt-1">📅 Tour: ${app.booking_date} at ${app.booking_time}</p>` : ''}
-                        <p class="text-xs mt-1">Status: <span class="font-semibold ${app.status === 'pending' ? 'text-yellow-600' : app.status === 'approved' ? 'text-green-600' : 'text-red-600'}">${app.status}</span></p>
-                    </div>
-                `;
+                div.innerHTML = `<div><p class="font-bold">${app.property_title}</p>${app.booking_date ? `<p class="text-xs text-indigo-600 mt-1">📅 Tour: ${app.booking_date} at ${app.booking_time}</p>` : ''}<p class="text-xs mt-1">Status: <span class="font-semibold ${app.status === 'pending' ? 'text-yellow-600' : app.status === 'approved' ? 'text-green-600' : 'text-red-600'}">${app.status}</span></p></div>`;
                 container.appendChild(div);
             });
         }
 
-        // --- REVIEW FUNCTIONS ---
         function openReviewModal(propertyId) {
-            currentPropertyId = propertyId;
-            selectedTags = [];
+            currentPropertyId = propertyId; selectedTags = [];
             document.querySelectorAll('.tag-btn').forEach(btn => btn.classList.remove('selected'));
             document.getElementById('review-comment').value = '';
             document.getElementById('review-modal').classList.remove('hidden');
         }
-
-        function closeReviewModal() {
-            document.getElementById('review-modal').classList.add('hidden');
-        }
-
+        function closeReviewModal() { document.getElementById('review-modal').classList.add('hidden'); }
         function toggleTag(btn, tag) {
-            if (selectedTags.includes(tag)) {
-                selectedTags = selectedTags.filter(t => t !== tag);
-                btn.classList.remove('selected');
-            } else {
-                selectedTags.push(tag);
-                btn.classList.add('selected');
-            }
+            if (selectedTags.includes(tag)) { selectedTags = selectedTags.filter(t => t !== tag); btn.classList.remove('selected'); }
+            else { selectedTags.push(tag); btn.classList.add('selected'); }
         }
-
         async function submitReview() {
-            if (selectedTags.length === 0) {
-                showNotification('Please select at least one tag.', 'error');
-                return;
-            }
+            if (selectedTags.length === 0) { showNotification('Please select at least one tag.', 'error'); return; }
             const token = localStorage.getItem('makao_token');
             const comment = document.getElementById('review-comment').value;
-            
             try {
-                const res = await fetch(`${API}/api/v1/reviews`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-                    body: JSON.stringify({
-                        target_id: currentPropertyId,
-                        target_type: 'property',
-                        tags: selectedTags.join(','),
-                        comment: comment
-                    })
-                });
+                const res = await fetch(`${API}/api/v1/reviews`, { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }, body: JSON.stringify({ target_id: currentPropertyId, target_type: 'property', tags: selectedTags.join(','), comment: comment }) });
                 if (!res.ok) throw new Error((await res.json()).detail);
-                showNotification('Review submitted successfully! Thank you for your feedback.', 'success');
-                closeReviewModal();
-                loadBrowseProperties();
-            } catch (err) {
-                showNotification('Error: ' + err.message, 'error');
-            }
+                showNotification('Review submitted successfully!', 'success');
+                closeReviewModal(); loadBrowseProperties();
+            } catch (err) { showNotification('Error: ' + err.message, 'error'); }
         }
-
         async function viewPropertyReviews(propertyId, title) {
-            currentPropertyId = propertyId;
-            currentPropertyTitle = title;
+            currentPropertyId = propertyId; currentPropertyTitle = title;
             const modal = document.getElementById('view-reviews-modal');
             const content = document.getElementById('reviews-content');
-            
             content.innerHTML = '<p class="text-center text-gray-500">Loading reviews...</p>';
             modal.classList.remove('hidden');
-            
             try {
                 const res = await fetch(`${API}/api/v1/reviews/${propertyId}`);
                 if (res.ok) {
                     const data = await res.json();
-                    if (data.total_reviews === 0) {
-                        content.innerHTML = '<p class="text-center text-gray-500">No reviews yet for this property.</p>';
-                    } else {
-                        let html = `<div class="mb-4 p-4 bg-indigo-50 rounded-lg"><p class="text-2xl font-bold text-indigo-600">${data.average_rating} </p><p class="text-sm text-gray-600">${data.total_reviews} total reviews</p></div>`;
-                        html += '<div class="space-y-3">';
+                    if (data.total_reviews === 0) { content.innerHTML = '<p class="text-center text-gray-500">No reviews yet.</p>'; }
+                    else {
+                        let html = `<div class="mb-4 p-4 bg-indigo-50 rounded-lg"><p class="text-2xl font-bold text-indigo-600">${data.average_rating} ⭐</p><p class="text-sm text-gray-600">${data.total_reviews} total reviews</p></div><div class="space-y-3">`;
                         data.reviews.forEach(review => {
                             const stars = '⭐'.repeat(Math.round(review.rating));
                             const date = new Date(review.created_at).toLocaleDateString();
-                            html += `
-                                <div class="border-b pb-3">
-                                    <div class="flex justify-between items-center mb-1">
-                                        <span class="font-semibold">${stars}</span>
-                                        <span class="text-xs text-gray-500">${date}</span>
-                                    </div>
-                                    <p class="text-sm text-gray-700 mb-1"><strong>Tags:</strong> ${review.tags}</p>
-                                    ${review.comment ? `<p class="text-sm text-gray-600">"${review.comment}"</p>` : ''}
-                                </div>
-                            `;
+                            html += `<div class="border-b pb-3"><div class="flex justify-between items-center mb-1"><span class="font-semibold">${stars}</span><span class="text-xs text-gray-500">${date}</span></div><p class="text-sm text-gray-700 mb-1"><strong>Tags:</strong> ${review.tags}</p>${review.comment ? `<p class="text-sm text-gray-600">"${review.comment}"</p>` : ''}</div>`;
                         });
-                        html += '</div>';
-                        content.innerHTML = html;
+                        html += '</div>'; content.innerHTML = html;
                     }
                 }
-            } catch (err) {
-                content.innerHTML = '<p class="text-center text-red-500">Failed to load reviews.</p>';
-            }
+            } catch (err) { content.innerHTML = '<p class="text-center text-red-500">Failed to load reviews.</p>'; }
         }
+        function closeViewReviewsModal() { document.getElementById('view-reviews-modal').classList.add('hidden'); }
+        function showPropertyTours(propertyId) { switchTab('applications'); }
 
-        function closeViewReviewsModal() {
-            document.getElementById('view-reviews-modal').classList.add('hidden');
-        }
-
-        function showPropertyTours(propertyId) {
-            // Redirect to applications tab which shows tours
-            switchTab('applications');
-        }
-
-        // --- BOOKING MODAL LOGIC ---
         async function openBookingModal(propertyId, title) {
-            currentPropertyId = propertyId;
-            currentPropertyTitle = title;
-            selectedTime = null;
+            currentPropertyId = propertyId; currentPropertyTitle = title; selectedTime = null;
             document.getElementById('booking-modal').classList.remove('hidden');
             const today = new Date().toISOString().split('T')[0];
             document.getElementById('booking-date').min = today;
@@ -751,12 +595,9 @@
             if(res.ok) { bookedSlots = await res.json(); } else { bookedSlots = []; }
             generateTimeSlots();
         }
-
         function closeModal() { document.getElementById('booking-modal').classList.add('hidden'); }
-
         function generateTimeSlots() {
-            const container = document.getElementById('time-slots');
-            container.innerHTML = '';
+            const container = document.getElementById('time-slots'); container.innerHTML = '';
             const times = ['9:00 AM', '10:00 AM', '11:00 AM', '12:00 PM', '2:00 PM', '3:00 PM', '4:00 PM', '5:00 PM'];
             const selectedDate = document.getElementById('booking-date').value;
             const bookedTimesForDate = bookedSlots.filter(b => b.date === selectedDate).map(b => b.time);
@@ -764,62 +605,39 @@
                 const isBooked = bookedTimesForDate.includes(time);
                 const btn = document.createElement('button');
                 btn.className = `py-2 px-3 rounded text-sm font-medium border ${isBooked ? 'bg-gray-100 text-gray-400 cursor-not-allowed border-gray-200' : 'bg-white text-indigo-600 border-indigo-200 hover:bg-indigo-50'}`;
-                btn.textContent = time;
-                btn.disabled = isBooked;
+                btn.textContent = time; btn.disabled = isBooked;
                 if (!isBooked) { btn.onclick = () => selectTime(btn, time); }
                 container.appendChild(btn);
             });
         }
-
         function selectTime(btn, time) {
-            document.querySelectorAll('#time-slots button:not(:disabled)').forEach(b => {
-                b.className = 'py-2 px-3 rounded text-sm font-medium border bg-white text-indigo-600 border-indigo-200 hover:bg-indigo-50';
-            });
+            document.querySelectorAll('#time-slots button:not(:disabled)').forEach(b => { b.className = 'py-2 px-3 rounded text-sm font-medium border bg-white text-indigo-600 border-indigo-200 hover:bg-indigo-50'; });
             btn.className = 'py-2 px-3 rounded text-sm font-medium border bg-indigo-600 text-white border-indigo-600';
             selectedTime = time;
         }
-
         document.getElementById('booking-date').addEventListener('change', generateTimeSlots);
-
         async function submitBooking() {
-            if (!selectedTime) { 
-                showNotification('Please select a time slot.', 'error');
-                return; 
-            }
+            if (!selectedTime) { showNotification('Please select a time slot.', 'error'); return; }
             const date = document.getElementById('booking-date').value;
             const message = document.getElementById('booking-message').value;
             const token = localStorage.getItem('makao_token');
             try {
-                const res = await fetch(`${API}/api/v1/applications`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-                    body: JSON.stringify({ property_id: currentPropertyId, message, booking_date: date, booking_time: selectedTime })
-                });
+                const res = await fetch(`${API}/api/v1/applications`, { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }, body: JSON.stringify({ property_id: currentPropertyId, message, booking_date: date, booking_time: selectedTime }) });
                 if (!res.ok) throw new Error((await res.json()).detail);
-                showNotification(`Tour booked for ${currentPropertyTitle} on ${date} at ${selectedTime}!`, 'success');
-                closeModal();
-            } catch (err) { 
-                showNotification('Error: ' + err.message, 'error');
-            }
+                showNotification(`Tour booked for ${currentPropertyTitle}!`, 'success'); closeModal();
+            } catch (err) { showNotification('Error: ' + err.message, 'error'); }
         }
-
         async function updateApp(appId, status, propertyTitle) {
             const token = localStorage.getItem('makao_token');
             try {
-                await fetch(`${API}/api/v1/landlord/applications/${appId}`, {
-                    method: 'PATCH',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-                    body: JSON.stringify({ status })
-                });
+                await fetch(`${API}/api/v1/landlord/applications/${appId}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }, body: JSON.stringify({ status }) });
                 const action = status === 'approved' ? 'approved' : 'declined';
                 showNotification(`Tour ${action} for ${propertyTitle}!`, status === 'approved' ? 'success' : 'info');
-                loadApplications();
-                checkNotifications();
-            } catch (err) {
-                showNotification('Failed to update application', 'error');
-            }
+                loadApplications(); checkNotifications();
+            } catch (err) { showNotification('Failed to update application', 'error'); }
         }
 
+        // --- FIXED: PROPERTY FORM WITH ERROR HANDLING ---
         document.getElementById('add-property-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const token = localStorage.getItem('makao_token');
@@ -833,21 +651,30 @@
                 latitude: parseFloat(document.getElementById('prop-lat').value) || 0.0,
                 longitude: parseFloat(document.getElementById('prop-lng').value) || 0.0
             };
-            await fetch(`${API}/api/v1/landlord/properties`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-                body: JSON.stringify(data)
-            });
-            showNotification('Property added successfully!', 'success');
-            e.target.reset();
-            // Redirect to My Properties tab
-            switchTab('properties');
-            loadMyProperties();
+            
+            try {
+                const res = await fetch(`${API}/api/v1/landlord/properties`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify(data)
+                });
+                
+                if (!res.ok) {
+                    const errorData = await res.json();
+                    throw new Error(errorData.detail || 'Failed to save property');
+                }
+                
+                showNotification('Property added successfully!', 'success');
+                e.target.reset();
+                switchTab('properties');
+                loadMyProperties();
+            } catch (err) {
+                console.error('Property creation error:', err);
+                showNotification('Error: ' + err.message, 'error');
+            }
         });
 
-        function toggleAI() {
-            showNotification("Makao AI: 'Hello! I can help you find the perfect home or manage your properties. What would you like to know?'", 'info');
-        }
+        function toggleAI() { showNotification("Makao AI: 'Hello! How can I help?'", 'info'); }
     </script>
 </body>
 </html>
