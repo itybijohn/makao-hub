@@ -6,30 +6,22 @@
     <title>Makao Digital Hub</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* AI Button Animation */
         @keyframes float {
             0% { transform: translateY(0px); opacity: 0.8; }
             50% { transform: translateY(-10px); opacity: 1; }
             100% { transform: translateY(0px); opacity: 0.8; }
         }
-        .ai-float {
-            animation: float 3s ease-in-out infinite;
-        }
-        /* Modal Backdrop */
-        .modal-backdrop {
-            background-color: rgba(0, 0, 0, 0.5);
-        }
+        .ai-float { animation: float 3s ease-in-out infinite; }
+        .modal-backdrop { background-color: rgba(0, 0, 0, 0.5); }
     </style>
 </head>
 <body class="bg-gray-50 text-gray-800 font-sans">
-    <!-- LOGIN/REGISTER VIEW -->
     <div id="auth-view" class="min-h-screen flex items-center justify-center p-4">
         <div class="bg-white p-8 rounded-xl shadow-lg w-full max-w-md">
             <div class="text-center mb-6">
                 <h1 class="text-3xl font-bold text-indigo-600">Makao Hub</h1>
                 <p class="text-gray-500 mt-2">Your Digital Property Partner</p>
             </div>
-            <!-- Login Form -->
             <form id="login-form" class="space-y-4">
                 <div>
                     <label class="block text-sm font-medium text-gray-700">Username</label>
@@ -45,7 +37,6 @@
                     New here? <a href="#" onclick="showRegister()" class="text-indigo-600 hover:underline font-semibold">Create an account</a>
                 </p>
             </form>
-            <!-- Register Form -->
             <form id="register-form" class="space-y-4 hidden">
                 <div>
                     <label class="block text-sm font-medium text-gray-700">Username</label>
@@ -71,9 +62,7 @@
         </div>
     </div>
 
-    <!-- MAIN DASHBOARD VIEW -->
     <div id="dashboard-view" class="hidden min-h-screen">
-        <!-- LANDLORD THEME: Indigo/Blue -->
         <nav id="landlord-nav" class="bg-indigo-600 text-white shadow-lg hidden">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="flex items-center justify-between h-16">
@@ -86,7 +75,6 @@
             </div>
         </nav>
 
-        <!-- TENANT THEME: Green/Teal -->
         <nav id="tenant-nav" class="bg-emerald-600 text-white shadow-lg hidden">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="flex items-center justify-between h-16">
@@ -100,7 +88,6 @@
         </nav>
 
         <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <!-- Navigation Tabs -->
             <div class="flex space-x-4 mb-8 border-b border-gray-200">
                 <button onclick="switchTab('properties')" id="tab-properties" class="tab-btn py-2 px-4 border-b-2 border-indigo-600 text-indigo-600 font-medium">My Properties</button>
                 <button onclick="switchTab('browse')" id="tab-browse" class="tab-btn py-2 px-4 text-gray-500 hover:text-gray-700">Browse Homes</button>
@@ -110,7 +97,6 @@
                 </button>
             </div>
 
-            <!-- TAB 1: MY PROPERTIES (Landlord) -->
             <div id="view-properties" class="tab-content">
                 <div class="bg-white p-6 rounded-lg shadow-md mb-8">
                     <h3 class="text-lg font-semibold text-gray-800 mb-4">Add New Property</h3>
@@ -119,8 +105,11 @@
                         <input type="text" id="prop-location" placeholder="Location" class="px-3 py-2 border rounded-md" required>
                         <input type="number" id="prop-rent" placeholder="Rent (KES)" class="px-3 py-2 border rounded-md" required>
                         <input type="number" id="prop-beds" placeholder="Bedrooms" class="px-3 py-2 border rounded-md" required>
-                        <!-- NEW: Image URL Field -->
-                        <input type="url" id="prop-image" placeholder="Image URL (optional)" class="md:col-span-2 px-3 py-2 border rounded-md">
+                        <input type="text" id="prop-image" placeholder="Image URL (optional)" class="md:col-span-2 px-3 py-2 border rounded-md">
+                        <div class="grid grid-cols-2 gap-4 md:col-span-2">
+                            <input type="number" step="any" id="prop-lat" placeholder="Latitude (e.g., -1.2921)" class="px-3 py-2 border rounded-md">
+                            <input type="number" step="any" id="prop-lng" placeholder="Longitude (e.g., 36.8219)" class="px-3 py-2 border rounded-md">
+                        </div>
                         <textarea id="prop-description" placeholder="Description" rows="2" class="md:col-span-2 px-3 py-2 border rounded-md"></textarea>
                         <button type="submit" class="md:col-span-2 bg-green-600 text-white py-2 rounded-md hover:bg-green-700">+ Add Property</button>
                     </form>
@@ -128,13 +117,11 @@
                 <div id="my-properties-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
             </div>
 
-            <!-- TAB 2: BROWSE HOMES (Tenant) -->
             <div id="view-browse" class="tab-content hidden">
                 <h2 class="text-2xl font-bold text-gray-900 mb-6">Available Properties</h2>
                 <div id="browse-properties-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
             </div>
 
-            <!-- TAB 3: APPLICATIONS (Landlord & Tenant) -->
             <div id="view-applications" class="tab-content hidden">
                 <h2 class="text-2xl font-bold text-gray-900 mb-6">Applications</h2>
                 <div id="applications-list" class="space-y-4"></div>
@@ -142,7 +129,6 @@
         </main>
     </div>
 
-    <!-- BOOKING MODAL -->
     <div id="booking-modal" class="fixed inset-0 modal-backdrop hidden flex items-center justify-center z-50 p-4">
         <div class="bg-white rounded-xl shadow-2xl w-full max-w-lg overflow-hidden">
             <div class="bg-indigo-600 p-4 flex justify-between items-center">
@@ -150,34 +136,24 @@
                 <button onclick="closeModal()" class="text-white hover:text-gray-200 text-2xl">&times;</button>
             </div>
             <div class="p-6">
-                <p class="text-sm text-gray-600 mb-4">Select a date and time for your viewing. Booked slots are disabled.</p>
-                
-                <!-- Date Picker -->
+                <p class="text-sm text-gray-600 mb-4">Select a date and time for your viewing.</p>
                 <div class="mb-4">
                     <label class="block text-sm font-medium text-gray-700 mb-1">Select Date</label>
                     <input type="date" id="booking-date" class="w-full px-3 py-2 border rounded-md" min="">
                 </div>
-
-                <!-- Time Slots -->
                 <div class="mb-4">
                     <label class="block text-sm font-medium text-gray-700 mb-2">Available Times</label>
-                    <div id="time-slots" class="grid grid-cols-3 gap-2">
-                        <!-- Slots injected by JS -->
-                    </div>
+                    <div id="time-slots" class="grid grid-cols-3 gap-2"></div>
                 </div>
-
-                <!-- Message -->
                 <div class="mb-4">
                     <label class="block text-sm font-medium text-gray-700 mb-1">Message to Landlord (Optional)</label>
                     <textarea id="booking-message" rows="2" class="w-full px-3 py-2 border rounded-md" placeholder="Hi, I'm interested..."></textarea>
                 </div>
-
                 <button onclick="submitBooking()" class="w-full bg-indigo-600 text-white py-2 rounded-md hover:bg-indigo-700 font-medium">Confirm Booking</button>
             </div>
         </div>
     </div>
 
-    <!-- AI ASSISTANT BUTTON -->
     <div class="fixed bottom-6 right-6 z-40">
         <button class="ai-float bg-gradient-to-r from-purple-600 to-indigo-600 text-white p-4 rounded-full shadow-lg hover:shadow-xl transition-all flex items-center justify-center group" onclick="toggleAI()">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -194,7 +170,6 @@
         let currentPropertyId = null;
         let bookedSlots = [];
 
-        // --- AUTH LOGIC ---
         window.addEventListener('DOMContentLoaded', () => {
             const token = localStorage.getItem('makao_token');
             currentUserRole = localStorage.getItem('makao_role') || 'landlord';
@@ -234,7 +209,6 @@
         function showDashboard() {
             document.getElementById('auth-view').classList.add('hidden');
             document.getElementById('dashboard-view').classList.remove('hidden');
-            
             if (currentUserRole === 'tenant') {
                 document.getElementById('tenant-nav').classList.remove('hidden');
                 document.getElementById('landlord-nav').classList.add('hidden');
@@ -253,7 +227,6 @@
             if (currentUserRole !== 'landlord') return;
             const token = localStorage.getItem('makao_token');
             try {
-                // Note: Endpoint might be missing in current backend, ignoring error safely
                 const res = await fetch(`${API}/api/v1/notifications/unread`, { headers: { 'Authorization': `Bearer ${token}` } });
                 if(res.ok) {
                     const data = await res.json();
@@ -262,9 +235,7 @@
                         badge.textContent = data.unread_count;
                         badge.classList.remove('hidden');
                         badge.classList.add('flex');
-                    } else {
-                        badge.classList.add('hidden');
-                    }
+                    } else { badge.classList.add('hidden'); }
                 }
             } catch (err) { console.error('Notification check failed', err); }
         }
@@ -311,18 +282,25 @@
                 const card = document.createElement('div');
                 card.className = 'bg-white rounded-lg shadow-md overflow-hidden flex flex-col';
                 
-                // NEW: Image handling
                 const imageHtml = p.image_url 
                     ? `<img src="${p.image_url}" alt="${p.title}" class="w-full h-48 object-cover">` 
                     : `<div class="w-full h-48 bg-gray-200 flex items-center justify-center text-gray-400">No Image Available</div>`;
+
+                // NEW: Map Button Logic
+                let mapButton = '';
+                if (p.latitude && p.longitude && p.latitude !== 0 && p.longitude !== 0) {
+                    const mapUrl = `https://www.google.com/maps/search/?api=1&query=${p.latitude},${p.longitude}`;
+                    mapButton = `<a href="${mapUrl}" target="_blank" class="block w-full text-center mt-2 bg-blue-100 text-blue-700 py-2 rounded hover:bg-blue-200 font-medium text-sm">📍 View on Map</a>`;
+                }
 
                 card.innerHTML = `
                     ${imageHtml}
                     <div class="p-6 flex-grow">
                         <h3 class="text-lg font-bold">${p.title}</h3>
-                        <p class="text-gray-600 text-sm"> ${p.location}</p>
+                        <p class="text-gray-600 text-sm">📍 ${p.location}</p>
                         <p class="text-indigo-600 font-bold mt-2">KES ${p.rent_amount.toLocaleString()}/mo</p>
                         <p class="text-sm text-gray-500 mt-2 line-clamp-3">${p.description || ''}</p>
+                        ${mapButton}
                     </div>
                     <div class="p-6 pt-0">
                         ${isBrowseMode ? `<button onclick="openBookingModal('${p.id}')" class="w-full bg-emerald-600 text-white py-2 rounded hover:bg-emerald-700">Book Tour</button>` : ''}
@@ -342,7 +320,7 @@
                     <div>
                         <p class="font-bold">${app.property_title}</p>
                         <p class="text-sm text-gray-600">Message: "${app.message}"</p>
-                        ${app.booking_date ? `<p class="text-xs text-indigo-600 mt-1"> Booked: ${app.booking_date} at ${app.booking_time}</p>` : ''}
+                        ${app.booking_date ? `<p class="text-xs text-indigo-600 mt-1">📅 Booked: ${app.booking_date} at ${app.booking_time}</p>` : ''}
                         <p class="text-xs mt-1">Status: <span class="font-semibold ${app.status === 'pending' ? 'text-yellow-600' : app.status === 'approved' ? 'text-green-600' : 'text-red-600'}">${app.status}</span></p>
                     </div>
                     ${app.status === 'pending' ? `
@@ -373,48 +351,34 @@
             });
         }
 
-        // --- BOOKING MODAL LOGIC ---
         async function openBookingModal(propertyId) {
             currentPropertyId = propertyId;
             selectedTime = null;
             document.getElementById('booking-modal').classList.remove('hidden');
-            
             const today = new Date().toISOString().split('T')[0];
             document.getElementById('booking-date').min = today;
             document.getElementById('booking-date').value = today;
-
             const token = localStorage.getItem('makao_token');
             const res = await fetch(`${API}/api/v1/properties/${propertyId}/bookings`, { headers: { 'Authorization': `Bearer ${token}` } });
-            if(res.ok) {
-                bookedSlots = await res.json();
-            } else {
-                bookedSlots = [];
-            }
-            
+            if(res.ok) { bookedSlots = await res.json(); } else { bookedSlots = []; }
             generateTimeSlots();
         }
 
-        function closeModal() {
-            document.getElementById('booking-modal').classList.add('hidden');
-        }
+        function closeModal() { document.getElementById('booking-modal').classList.add('hidden'); }
 
         function generateTimeSlots() {
             const container = document.getElementById('time-slots');
             container.innerHTML = '';
             const times = ['9:00 AM', '10:00 AM', '11:00 AM', '12:00 PM', '2:00 PM', '3:00 PM', '4:00 PM', '5:00 PM'];
             const selectedDate = document.getElementById('booking-date').value;
-            
             const bookedTimesForDate = bookedSlots.filter(b => b.date === selectedDate).map(b => b.time);
-
             times.forEach(time => {
                 const isBooked = bookedTimesForDate.includes(time);
                 const btn = document.createElement('button');
                 btn.className = `py-2 px-3 rounded text-sm font-medium border ${isBooked ? 'bg-gray-100 text-gray-400 cursor-not-allowed border-gray-200' : 'bg-white text-indigo-600 border-indigo-200 hover:bg-indigo-50'}`;
                 btn.textContent = time;
                 btn.disabled = isBooked;
-                if (!isBooked) {
-                    btn.onclick = () => selectTime(btn, time);
-                }
+                if (!isBooked) { btn.onclick = () => selectTime(btn, time); }
                 container.appendChild(btn);
             });
         }
@@ -434,7 +398,6 @@
             const date = document.getElementById('booking-date').value;
             const message = document.getElementById('booking-message').value;
             const token = localStorage.getItem('makao_token');
-
             try {
                 const res = await fetch(`${API}/api/v1/applications`, {
                     method: 'POST',
@@ -467,7 +430,9 @@
                 rent_amount: parseFloat(document.getElementById('prop-rent').value),
                 bedrooms: parseInt(document.getElementById('prop-beds').value),
                 description: document.getElementById('prop-description').value,
-                image_url: document.getElementById('prop-image').value // NEW: Capture image URL
+                image_url: document.getElementById('prop-image').value,
+                latitude: parseFloat(document.getElementById('prop-lat').value) || 0.0,
+                longitude: parseFloat(document.getElementById('prop-lng').value) || 0.0
             };
             await fetch(`${API}/api/v1/landlord/properties`, {
                 method: 'POST',

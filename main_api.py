@@ -57,6 +57,8 @@ class PropertyCreate(BaseModel):
     deposit: float = 0.0
     description: str = ""
     image_url: str = ""
+    latitude: float = 0.0
+    longitude: float = 0.0
     virtual_tour_url: str = ""
 
 class ApplicationCreate(BaseModel):
@@ -134,7 +136,8 @@ def create_property(data: PropertyCreate, user: dict = Depends(get_current_user)
     new_prop = Property(
         title=data.title, location=data.location, rent_amount=data.rent_amount,
         bedrooms=data.bedrooms, deposit=data.deposit, description=data.description,
-        image_url=data.image_url, virtual_tour_url=data.virtual_tour_url, landlord_id=user["user_id"]
+        image_url=data.image_url, latitude=data.latitude, longitude=data.longitude,
+        virtual_tour_url=data.virtual_tour_url, landlord_id=user["user_id"]
     )
     session.add(new_prop)
     session.commit()
