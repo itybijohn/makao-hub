@@ -40,7 +40,6 @@ def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(securit
     except jwt.InvalidTokenError:
         raise HTTPException(status_code=401, detail="Invalid token")
 
-# --- MODELS FOR AUTH & PROPERTIES ---
 class UserRegister(BaseModel):
     username: str
     password: str
@@ -63,11 +62,12 @@ class PropertyCreate(BaseModel):
 class ApplicationCreate(BaseModel):
     property_id: str
     message: str = ""
+    booking_date: str = ""
+    booking_time: str = ""
 
 class ApplicationUpdate(BaseModel):
     status: str
 
-# --- AUTH ENDPOINTS ---
 @app.post("/api/v1/auth/register", status_code=201)
 def register_user(data: UserRegister, session: Session = Depends(get_session)):
     existing_user = session.exec(select(User).where(User.username == data.username)).first()
@@ -91,7 +91,6 @@ def login_user(data: UserLogin, session: Session = Depends(get_session)):
     token = jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
     return {"access_token": token, "token_type": "bearer", "role": user.role}
 
-# --- DASHBOARDS ---
 @app.get("/api/v1/dashboard/landlord")
 def landlord_dashboard(user: dict = Depends(get_current_user), session: Session = Depends(get_session)):
     properties = session.exec(select(Property).where(Property.landlord_id == user["user_id"])).all()
@@ -130,10 +129,9 @@ def fundi_dashboard(user: dict = Depends(get_current_user), session: Session = D
 def system_health():
     return {"status": "operational", "database": "Connected"}
 
-# --- PROPERTY ENDPOINTS ---
 @app.post("/api/v1/landlord/properties", status_code=201)
 def create_property(data: PropertyCreate, user: dict = Depends(get_current_user), session: Session = Depends(get_session)):
-        new_prop = Property(
+    new_prop = Property(
         title=data.title, location=data.location, rent_amount=data.rent_amount,
         bedrooms=data.bedrooms, deposit=data.deposit, description=data.description,
         image_url=data.image_url, virtual_tour_url=data.virtual_tour_url, landlord_id=user["user_id"]
@@ -148,13 +146,19 @@ def get_public_properties(session: Session = Depends(get_session)):
     properties = session.exec(select(Property)).all()
     return [p.model_dump() for p in properties]
 
-# --- APPLICATION ENDPOINTS ---
 @app.post("/api/v1/applications", status_code=201)
 def create_application(data: ApplicationCreate, user: dict = Depends(get_current_user), session: Session = Depends(get_session)):
     existing = session.exec(select(TenantApplication).where(TenantApplication.property_id == data.property_id, TenantApplication.tenant_id == user["user_id"])).first()
     if existing:
         raise HTTPException(status_code=400, detail="You have already applied for this property")
-    new_app = TenantApplication(property_id=data.property_id, tenant_id=user["user_id"], message=data.message, status="pending")
+    new_app = TenantApplication(
+        property_id=data.property_id, 
+        tenant_id=user["user_id"], 
+        message=data.message, 
+        status="pending",
+        booking_date=data.booking_date,
+        booking_time=data.booking_time
+    )
     session.add(new_app)
     session.commit()
     session.refresh(new_app)
@@ -197,10 +201,19 @@ def update_application_status(application_id: str, data: ApplicationUpdate, user
     session.refresh(app)
     return {"message": f"Application {data.status}", "application": app.model_dump()}
 
-# --- SERVE FRONTEND ---
+@app.get("/api/v1/properties/{property_id}/bookings")
+def get_property_bookings(property_id: str, session: Session = Depends(get_session)):
+    bookings = session.exec(
+        select(TenantApplication).where(
+            TenantApplication.property_id == property_id,
+            TenantApplication.status.in_(["pending", "approved"]),
+            TenantApplication.booking_date != ""
+        )
+    ).all()
+    return [{"date": b.booking_date, "time": b.booking_time} for b in bookings]
+
 @app.get("/")
 def serve_frontend():
     return FileResponse("static/index.html")
 
-# --- STARTUP ---
 create_db_and_tables()

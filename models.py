@@ -18,7 +18,7 @@ class Property(SQLModel, table=True):
     bedrooms: int
     deposit: float = 0.0
     description: str = ""
-    image_url: str = ""  # <-- NEW FIELD
+    image_url: str = ""
     virtual_tour_url: str = ""
     status: str = "active"
     landlord_id: str = "landlord_123"
@@ -29,6 +29,8 @@ class TenantApplication(SQLModel, table=True):
     tenant_id: str
     status: str = "pending"
     message: str = ""
+    booking_date: str = ""
+    booking_time: str = ""
 
 class FundiJob(SQLModel, table=True):
     id: str = Field(default_factory=generate_uuid, primary_key=True)
