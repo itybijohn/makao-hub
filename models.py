@@ -18,6 +18,7 @@ class Property(SQLModel, table=True):
     bedrooms: int
     deposit: float = 0.0
     description: str = ""
+    image_url: str = ""  # <-- NEW FIELD
     virtual_tour_url: str = ""
     status: str = "active"
     landlord_id: str = "landlord_123"

@@ -5,6 +5,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Makao Digital Hub</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* AI Button Animation */
+        @keyframes float {
+            0% { transform: translateY(0px); opacity: 0.8; }
+            50% { transform: translateY(-10px); opacity: 1; }
+            100% { transform: translateY(0px); opacity: 0.8; }
+        }
+        .ai-float {
+            animation: float 3s ease-in-out infinite;
+        }
+        /* Modal Backdrop */
+        .modal-backdrop {
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+    </style>
 </head>
 <body class="bg-gray-50 text-gray-800 font-sans">
     <!-- LOGIN/REGISTER VIEW -->
@@ -104,6 +119,8 @@
                         <input type="text" id="prop-location" placeholder="Location" class="px-3 py-2 border rounded-md" required>
                         <input type="number" id="prop-rent" placeholder="Rent (KES)" class="px-3 py-2 border rounded-md" required>
                         <input type="number" id="prop-beds" placeholder="Bedrooms" class="px-3 py-2 border rounded-md" required>
+                        <!-- NEW: Image URL Field -->
+                        <input type="url" id="prop-image" placeholder="Image URL (optional)" class="md:col-span-2 px-3 py-2 border rounded-md">
                         <textarea id="prop-description" placeholder="Description" rows="2" class="md:col-span-2 px-3 py-2 border rounded-md"></textarea>
                         <button type="submit" class="md:col-span-2 bg-green-600 text-white py-2 rounded-md hover:bg-green-700">+ Add Property</button>
                     </form>
@@ -125,84 +142,99 @@
         </main>
     </div>
 
+    <!-- BOOKING MODAL -->
+    <div id="booking-modal" class="fixed inset-0 modal-backdrop hidden flex items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-lg overflow-hidden">
+            <div class="bg-indigo-600 p-4 flex justify-between items-center">
+                <h3 class="text-white font-bold text-lg">Book a House Tour</h3>
+                <button onclick="closeModal()" class="text-white hover:text-gray-200 text-2xl">&times;</button>
+            </div>
+            <div class="p-6">
+                <p class="text-sm text-gray-600 mb-4">Select a date and time for your viewing. Booked slots are disabled.</p>
+                
+                <!-- Date Picker -->
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Select Date</label>
+                    <input type="date" id="booking-date" class="w-full px-3 py-2 border rounded-md" min="">
+                </div>
+
+                <!-- Time Slots -->
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Available Times</label>
+                    <div id="time-slots" class="grid grid-cols-3 gap-2">
+                        <!-- Slots injected by JS -->
+                    </div>
+                </div>
+
+                <!-- Message -->
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Message to Landlord (Optional)</label>
+                    <textarea id="booking-message" rows="2" class="w-full px-3 py-2 border rounded-md" placeholder="Hi, I'm interested..."></textarea>
+                </div>
+
+                <button onclick="submitBooking()" class="w-full bg-indigo-600 text-white py-2 rounded-md hover:bg-indigo-700 font-medium">Confirm Booking</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI ASSISTANT BUTTON -->
+    <div class="fixed bottom-6 right-6 z-40">
+        <button class="ai-float bg-gradient-to-r from-purple-600 to-indigo-600 text-white p-4 rounded-full shadow-lg hover:shadow-xl transition-all flex items-center justify-center group" onclick="toggleAI()">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+            </svg>
+            <span class="absolute right-full mr-3 bg-gray-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">Ask Makao AI</span>
+        </button>
+    </div>
+
     <script>
         const API = '';
         let currentUserRole = 'landlord';
+        let selectedTime = null;
+        let currentPropertyId = null;
+        let bookedSlots = [];
 
+        // --- AUTH LOGIC ---
         window.addEventListener('DOMContentLoaded', () => {
             const token = localStorage.getItem('makao_token');
             currentUserRole = localStorage.getItem('makao_role') || 'landlord';
-            if (token) {
-                showDashboard();
-            }
+            if (token) showDashboard();
         });
 
-        function showRegister() {
-            document.getElementById('login-form').classList.add('hidden');
-            document.getElementById('register-form').classList.remove('hidden');
-        }
-
-        function showLogin() {
-            document.getElementById('register-form').classList.add('hidden');
-            document.getElementById('login-form').classList.remove('hidden');
-        }
+        function showRegister() { document.getElementById('login-form').classList.add('hidden'); document.getElementById('register-form').classList.remove('hidden'); }
+        function showLogin() { document.getElementById('register-form').classList.add('hidden'); document.getElementById('login-form').classList.remove('hidden'); }
 
         document.getElementById('register-form').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const data = {
-                username: document.getElementById('reg-username').value,
-                password: document.getElementById('reg-password').value,
-                role: document.getElementById('reg-role').value
-            };
+            const data = { username: document.getElementById('reg-username').value, password: document.getElementById('reg-password').value, role: document.getElementById('reg-role').value };
             try {
-                const res = await fetch(`${API}/api/v1/auth/register`, {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify(data)
-                });
+                const res = await fetch(`${API}/api/v1/auth/register`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(data) });
                 if (!res.ok) throw new Error((await res.json()).detail);
                 alert('Account created! Please log in.');
                 showLogin();
-            } catch (err) {
-                document.getElementById('reg-error-msg').textContent = err.message;
-                document.getElementById('reg-error-msg').classList.remove('hidden');
-            }
+            } catch (err) { document.getElementById('reg-error-msg').textContent = err.message; document.getElementById('reg-error-msg').classList.remove('hidden'); }
         });
 
         document.getElementById('login-form').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const data = {
-                username: document.getElementById('username').value,
-                password: document.getElementById('password').value
-            };
+            const data = { username: document.getElementById('username').value, password: document.getElementById('password').value };
             try {
-                const res = await fetch(`${API}/api/v1/auth/login`, {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify(data)
-                });
+                const res = await fetch(`${API}/api/v1/auth/login`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(data) });
                 if (!res.ok) throw new Error('Invalid credentials');
                 const result = await res.json();
                 localStorage.setItem('makao_token', result.access_token);
                 localStorage.setItem('makao_role', result.role);
                 currentUserRole = result.role;
                 showDashboard();
-            } catch (err) {
-                document.getElementById('error-msg').textContent = err.message;
-                document.getElementById('error-msg').classList.remove('hidden');
-            }
+            } catch (err) { document.getElementById('error-msg').textContent = err.message; document.getElementById('error-msg').classList.remove('hidden'); }
         });
 
-        function logout() {
-            localStorage.clear();
-            location.reload();
-        }
+        function logout() { localStorage.clear(); location.reload(); }
 
         function showDashboard() {
             document.getElementById('auth-view').classList.add('hidden');
             document.getElementById('dashboard-view').classList.remove('hidden');
             
-            // Apply theme based on role
             if (currentUserRole === 'tenant') {
                 document.getElementById('tenant-nav').classList.remove('hidden');
                 document.getElementById('landlord-nav').classList.add('hidden');
@@ -214,7 +246,6 @@
                 document.getElementById('tab-properties').style.display = 'block';
                 switchTab('properties');
             }
-            
             checkNotifications();
         }
 
@@ -222,49 +253,36 @@
             if (currentUserRole !== 'landlord') return;
             const token = localStorage.getItem('makao_token');
             try {
-                const res = await fetch(`${API}/api/v1/notifications/unread`, {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-                const data = await res.json();
-                const badge = document.getElementById('notification-badge');
-                if (data.unread_count > 0) {
-                    badge.textContent = data.unread_count;
-                    badge.classList.remove('hidden');
-                    badge.classList.add('flex');
-                } else {
-                    badge.classList.add('hidden');
+                // Note: Endpoint might be missing in current backend, ignoring error safely
+                const res = await fetch(`${API}/api/v1/notifications/unread`, { headers: { 'Authorization': `Bearer ${token}` } });
+                if(res.ok) {
+                    const data = await res.json();
+                    const badge = document.getElementById('notification-badge');
+                    if (data.unread_count > 0) {
+                        badge.textContent = data.unread_count;
+                        badge.classList.remove('hidden');
+                        badge.classList.add('flex');
+                    } else {
+                        badge.classList.add('hidden');
+                    }
                 }
-            } catch (err) {
-                console.error('Notification check failed', err);
-            }
+            } catch (err) { console.error('Notification check failed', err); }
         }
 
         function switchTab(tabName) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
-            document.querySelectorAll('.tab-btn').forEach(el => {
-                el.classList.remove('border-b-2', 'border-indigo-600', 'text-indigo-600', 'font-medium');
-                el.classList.add('text-gray-500');
-            });
+            document.querySelectorAll('.tab-btn').forEach(el => { el.classList.remove('border-b-2', 'border-indigo-600', 'text-indigo-600', 'font-medium'); el.classList.add('text-gray-500'); });
             document.getElementById(`view-${tabName}`).classList.remove('hidden');
             const btn = document.getElementById(`tab-${tabName}`);
-            if(btn) {
-                btn.classList.add('border-b-2', 'border-indigo-600', 'text-indigo-600', 'font-medium');
-                btn.classList.remove('text-gray-500');
-            }
-            
+            if(btn) { btn.classList.add('border-b-2', 'border-indigo-600', 'text-indigo-600', 'font-medium'); btn.classList.remove('text-gray-500'); }
             if (tabName === 'properties') loadMyProperties();
             if (tabName === 'browse') loadBrowseProperties();
-            if (tabName === 'applications') {
-                loadApplications();
-                document.getElementById('notification-badge').classList.add('hidden');
-            }
+            if (tabName === 'applications') { loadApplications(); document.getElementById('notification-badge').classList.add('hidden'); }
         }
 
         async function loadMyProperties() {
             const token = localStorage.getItem('makao_token');
-            const res = await fetch(`${API}/api/v1/dashboard/landlord`, {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
+            const res = await fetch(`${API}/api/v1/dashboard/landlord`, { headers: { 'Authorization': `Bearer ${token}` } });
             const data = await res.json();
             renderGrid('my-properties-grid', data.my_properties || [], false);
         }
@@ -278,14 +296,10 @@
         async function loadApplications() {
             const token = localStorage.getItem('makao_token');
             if (currentUserRole === 'landlord') {
-                const res = await fetch(`${API}/api/v1/landlord/applications`, {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
+                const res = await fetch(`${API}/api/v1/landlord/applications`, { headers: { 'Authorization': `Bearer ${token}` } });
                 renderLandlordApps(await res.json());
             } else {
-                const res = await fetch(`${API}/api/v1/tenant/applications`, {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
+                const res = await fetch(`${API}/api/v1/tenant/applications`, { headers: { 'Authorization': `Bearer ${token}` } });
                 renderTenantApps(await res.json());
             }
         }
@@ -295,13 +309,24 @@
             container.innerHTML = properties.length ? '' : '<p class="text-gray-500 col-span-3 text-center">No properties found.</p>';
             properties.forEach(p => {
                 const card = document.createElement('div');
-                card.className = 'bg-white rounded-lg shadow-md p-6';
+                card.className = 'bg-white rounded-lg shadow-md overflow-hidden flex flex-col';
+                
+                // NEW: Image handling
+                const imageHtml = p.image_url 
+                    ? `<img src="${p.image_url}" alt="${p.title}" class="w-full h-48 object-cover">` 
+                    : `<div class="w-full h-48 bg-gray-200 flex items-center justify-center text-gray-400">No Image Available</div>`;
+
                 card.innerHTML = `
-                    <h3 class="text-lg font-bold">${p.title}</h3>
-                    <p class="text-gray-600 text-sm">📍 ${p.location}</p>
-                    <p class="text-indigo-600 font-bold mt-2">KES ${p.rent_amount.toLocaleString()}/mo</p>
-                    <p class="text-sm text-gray-500 mt-2">${p.description || ''}</p>
-                    ${isBrowseMode ? `<button onclick="applyForProperty('${p.id}')" class="mt-4 w-full bg-emerald-600 text-white py-2 rounded hover:bg-emerald-700">Apply Now</button>` : ''}
+                    ${imageHtml}
+                    <div class="p-6 flex-grow">
+                        <h3 class="text-lg font-bold">${p.title}</h3>
+                        <p class="text-gray-600 text-sm"> ${p.location}</p>
+                        <p class="text-indigo-600 font-bold mt-2">KES ${p.rent_amount.toLocaleString()}/mo</p>
+                        <p class="text-sm text-gray-500 mt-2 line-clamp-3">${p.description || ''}</p>
+                    </div>
+                    <div class="p-6 pt-0">
+                        ${isBrowseMode ? `<button onclick="openBookingModal('${p.id}')" class="w-full bg-emerald-600 text-white py-2 rounded hover:bg-emerald-700">Book Tour</button>` : ''}
+                    </div>
                 `;
                 container.appendChild(card);
             });
@@ -317,6 +342,7 @@
                     <div>
                         <p class="font-bold">${app.property_title}</p>
                         <p class="text-sm text-gray-600">Message: "${app.message}"</p>
+                        ${app.booking_date ? `<p class="text-xs text-indigo-600 mt-1"> Booked: ${app.booking_date} at ${app.booking_time}</p>` : ''}
                         <p class="text-xs mt-1">Status: <span class="font-semibold ${app.status === 'pending' ? 'text-yellow-600' : app.status === 'approved' ? 'text-green-600' : 'text-red-600'}">${app.status}</span></p>
                     </div>
                     ${app.status === 'pending' ? `
@@ -339,6 +365,7 @@
                 div.innerHTML = `
                     <div>
                         <p class="font-bold">${app.property_title}</p>
+                        ${app.booking_date ? `<p class="text-xs text-indigo-600 mt-1">📅 Tour: ${app.booking_date} at ${app.booking_time}</p>` : ''}
                         <p class="text-xs mt-1">Status: <span class="font-semibold ${app.status === 'pending' ? 'text-yellow-600' : app.status === 'approved' ? 'text-green-600' : 'text-red-600'}">${app.status}</span></p>
                     </div>
                 `;
@@ -346,21 +373,78 @@
             });
         }
 
-        async function applyForProperty(propertyId) {
+        // --- BOOKING MODAL LOGIC ---
+        async function openBookingModal(propertyId) {
+            currentPropertyId = propertyId;
+            selectedTime = null;
+            document.getElementById('booking-modal').classList.remove('hidden');
+            
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('booking-date').min = today;
+            document.getElementById('booking-date').value = today;
+
             const token = localStorage.getItem('makao_token');
-            const message = prompt("Send a message to the landlord:");
-            if (!message) return;
+            const res = await fetch(`${API}/api/v1/properties/${propertyId}/bookings`, { headers: { 'Authorization': `Bearer ${token}` } });
+            if(res.ok) {
+                bookedSlots = await res.json();
+            } else {
+                bookedSlots = [];
+            }
+            
+            generateTimeSlots();
+        }
+
+        function closeModal() {
+            document.getElementById('booking-modal').classList.add('hidden');
+        }
+
+        function generateTimeSlots() {
+            const container = document.getElementById('time-slots');
+            container.innerHTML = '';
+            const times = ['9:00 AM', '10:00 AM', '11:00 AM', '12:00 PM', '2:00 PM', '3:00 PM', '4:00 PM', '5:00 PM'];
+            const selectedDate = document.getElementById('booking-date').value;
+            
+            const bookedTimesForDate = bookedSlots.filter(b => b.date === selectedDate).map(b => b.time);
+
+            times.forEach(time => {
+                const isBooked = bookedTimesForDate.includes(time);
+                const btn = document.createElement('button');
+                btn.className = `py-2 px-3 rounded text-sm font-medium border ${isBooked ? 'bg-gray-100 text-gray-400 cursor-not-allowed border-gray-200' : 'bg-white text-indigo-600 border-indigo-200 hover:bg-indigo-50'}`;
+                btn.textContent = time;
+                btn.disabled = isBooked;
+                if (!isBooked) {
+                    btn.onclick = () => selectTime(btn, time);
+                }
+                container.appendChild(btn);
+            });
+        }
+
+        function selectTime(btn, time) {
+            document.querySelectorAll('#time-slots button:not(:disabled)').forEach(b => {
+                b.className = 'py-2 px-3 rounded text-sm font-medium border bg-white text-indigo-600 border-indigo-200 hover:bg-indigo-50';
+            });
+            btn.className = 'py-2 px-3 rounded text-sm font-medium border bg-indigo-600 text-white border-indigo-600';
+            selectedTime = time;
+        }
+
+        document.getElementById('booking-date').addEventListener('change', generateTimeSlots);
+
+        async function submitBooking() {
+            if (!selectedTime) { alert('Please select a time slot.'); return; }
+            const date = document.getElementById('booking-date').value;
+            const message = document.getElementById('booking-message').value;
+            const token = localStorage.getItem('makao_token');
+
             try {
                 const res = await fetch(`${API}/api/v1/applications`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-                    body: JSON.stringify({ property_id: propertyId, message })
+                    body: JSON.stringify({ property_id: currentPropertyId, message, booking_date: date, booking_time: selectedTime })
                 });
                 if (!res.ok) throw new Error((await res.json()).detail);
-                alert('Application sent successfully!');
-            } catch (err) {
-                alert('Error: ' + err.message);
-            }
+                alert('Tour booked successfully!');
+                closeModal();
+            } catch (err) { alert('Error: ' + err.message); }
         }
 
         async function updateApp(appId, status) {
@@ -382,7 +466,8 @@
                 location: document.getElementById('prop-location').value,
                 rent_amount: parseFloat(document.getElementById('prop-rent').value),
                 bedrooms: parseInt(document.getElementById('prop-beds').value),
-                description: document.getElementById('prop-description').value
+                description: document.getElementById('prop-description').value,
+                image_url: document.getElementById('prop-image').value // NEW: Capture image URL
             };
             await fetch(`${API}/api/v1/landlord/properties`, {
                 method: 'POST',
@@ -392,6 +477,10 @@
             e.target.reset();
             loadMyProperties();
         });
+
+        function toggleAI() {
+            alert("Makao AI: 'Hello! I can help you find the perfect home or manage your properties. What would you like to know?'");
+        }
     </script>
 </body>
 </html>

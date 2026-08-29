@@ -57,6 +57,7 @@ class PropertyCreate(BaseModel):
     bedrooms: int
     deposit: float = 0.0
     description: str = ""
+    image_url: str = ""
     virtual_tour_url: str = ""
 
 class ApplicationCreate(BaseModel):
@@ -132,10 +133,10 @@ def system_health():
 # --- PROPERTY ENDPOINTS ---
 @app.post("/api/v1/landlord/properties", status_code=201)
 def create_property(data: PropertyCreate, user: dict = Depends(get_current_user), session: Session = Depends(get_session)):
-    new_prop = Property(
+        new_prop = Property(
         title=data.title, location=data.location, rent_amount=data.rent_amount,
         bedrooms=data.bedrooms, deposit=data.deposit, description=data.description,
-        virtual_tour_url=data.virtual_tour_url, landlord_id=user["user_id"]
+        image_url=data.image_url, virtual_tour_url=data.virtual_tour_url, landlord_id=user["user_id"]
     )
     session.add(new_prop)
     session.commit()
